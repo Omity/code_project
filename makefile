@@ -2,16 +2,17 @@ LIBS = -lm
 SRC = $(wildcard *.c)
 OBJS = $(patsubst %.c, %.o, $(SRC))
 CFLAGS = -Wall
+OBJ = $(patsubst %.c, %, $(SRC))
 
-ALL: output.out
+ALL: $(OBJ)
 
-output.out: $(OBJS)
-	gcc $< -o $@  
+$(OBJ): $(OBJS)
+	gcc $< -o $@
 
 $(OBJS): $(SRC)
 	gcc -c $< -o $@
 
 clean: 
-	rm -f $(OBJS) output.out
+	rm -f $(OBJS) $(OBJ)
 
 .PHONY: clean ALL

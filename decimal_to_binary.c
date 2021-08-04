@@ -13,7 +13,7 @@
 *******************************************************************************/
 
 
-int transDecimalToBinary(int num);
+void transDecimalToBinary(int num);
 
 
 int main()
@@ -27,7 +27,7 @@ int main()
 }
 
 
-int transDecimalToBinary(int num)
+void transDecimalToBinary(int num)
 {
     int i;
     int tmp[32];

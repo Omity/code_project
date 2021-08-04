@@ -15,14 +15,14 @@ enum nametype nameType;
 
 
 
-char main()
+int main()
 {
     int i;
     int *sex;
     char* name;
     srand((unsigned) time( NULL));
     printf("%s\t\t%s\t%s\t%s\n", "姓名", "性别", "学号", "成绩");
-    for(i = 0; i < 1000; ++i)
+    for(i = 0; i < 10; ++i)
     {
         name = getRandomName(getRandomValue, sex);
         if(*sex == 0)
@@ -165,7 +165,7 @@ char *getRandomName(int (*getRandom)(void), int *sex)
     
 }
 
-float delay_ms(int num)
+int delay_ms(int num)
 {
     int i;
     int j;
@@ -175,5 +175,7 @@ float delay_ms(int num)
          {
          }
     }
+
+    return 0;
 }
 

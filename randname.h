@@ -37,7 +37,7 @@ enum nametype
 
 int getRandomValue(void);
 char *getRandomName(int (*getRandom)(void), int *sex);
-float delay_ms(int num);
+int delay_ms(int num);
 
 
 

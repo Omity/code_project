@@ -40,7 +40,7 @@ linklist* listInit()
 
 ******************************************************************************/
 
-linklist* creatLinkList(linklist *headNode, int *inData, int dataNum)
+int creatLinkList(linklist *headNode, int *inData, int dataNum)
 {
     int i;
     linklist *currentNode;
@@ -57,6 +57,8 @@ linklist* creatLinkList(linklist *headNode, int *inData, int dataNum)
 
         currentNode->next = NULL;
     }
+
+    return 0;
 }
 
 /******************************************************************************
@@ -116,36 +118,41 @@ int insertList(linklist *headNode,int locateIndex,int inData)
 
 
 
-int deleteList(linklist *headNode,int index, int * dataToDel)
+int deleteList(linklist *headNode,int index, int *dataToDel)
 
 {
     int i = 1;
 
-    linklist *CurrentNode  = HeadNode; 
+    linklist *currentNode  = headNode; 
 
-    linklist *NodeToDelete;
+    linklist *nodeToDelete;
 
     //将CurrentNode指向待删除位置的前一个结点（index -1）
 
-    while(CurrentNode&& i<index-1)
+    while(currentNode && (i < index - 1))
 
     {
-        CurrentNode= CurrentNode->next;
+        currentNode = currentNode->next;
 
         i++;
 
     }
 
-    NodeToDelete = CurrentNode->next;
+    nodeToDelete      = currentNode->next;
 
-    *DataToDel =NodeToDelete->Element;
+    *dataToDel        = nodeToDelete->element;
 
-    CurrentNode->next= NodeToDelete->next;
+    currentNode->next = nodeToDelete->next;
 
-    free(NodeToDelete);
+    free(nodeToDelete);
 
     return 1;
+}
 
 
+int main()
+{
+    return 0;
+}
 
 

@@ -3,16 +3,15 @@ SRC = $(wildcard *.c)
 OBJS = $(patsubst %.c, %.o, $(SRC))
 CFLAGS = -Wall
 OBJ = $(patsubst %.c, %, $(SRC))
+CC = gcc
 
 ALL: $(OBJ)
 
-$(OBJ): $(OBJS)
-	gcc $< -o $@
-
-$(OBJS): $(SRC)
-	gcc -c $< -o $@
+$(OBJ):%:%.c 
+	$(CC) $< $(CFLAGS) -o $@ 
 
 clean: 
-	rm -f $(OBJS) $(OBJ)
+	$(foreach TARGET, $(OBJS), rm -f $(TARGET))
+	$(foreach TARGET, $(OBJ), rm -f $(TARGET))
 
 .PHONY: clean ALL

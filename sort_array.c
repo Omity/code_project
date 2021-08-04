@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <math.h>
 
 /*******************************************************************************
 
@@ -15,7 +15,7 @@
 void sort(float *arr, size_t size);
 
 
-float main()
+int main()
 {
     int     i;
     size_t  size;
@@ -45,7 +45,7 @@ void sort(float *arr, size_t size)
     {
         for(j = i + 1; j < size; ++j)
         {
-            if(0 < (arr[j] - arr[i]) < 1E-6)
+            if(0 < fabs(arr[j] - arr[i]) < 1E-6)
 	    {
 		tmp = arr[i];
 		arr[i] = arr[j];

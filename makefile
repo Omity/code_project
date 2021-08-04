@@ -17,7 +17,7 @@ clean:
 	$(foreach TARGET, $(OBJ), rm -f $(TARGET))
 
 up:
-	git add .
+	git add *.c
 	git commit -m "c语言作业"
 	git push origin c_100_example
 

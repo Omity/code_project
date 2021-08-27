@@ -1,28 +1,57 @@
+#  使用fileDiff函数去除因编译或者删除原因导致的文件不存在
+
 import os
 
 
 class CompareFile:
 
+    __sourceFileList = []
+    __targetFileList = []
+
     def __init__(self, arg1, arg2):
         self.file1 = arg1
         self.file2 = arg2
+        self.searchFileList(self.file1, self.file2)
+
+    def searchFileList(self, arg1, arg2):
+        for root, dirs, file in os.walk(arg1):
+            for name in file:
+                self.__sourceFileList.append(os.path.join(root, name))
+        for root, dirs, file in os.walk(arg2):
+            for name in file:
+                self.__targetFileList.append(os.path.join(root, name))
+
+    def fileDiff(self):
+        with open('out\\sFileDiff.log', 'w') as f:
+            for tar in self.__targetFileList:
+                if tar not in self.__sourceFileList:
+                    tmp = tar.split('\\')
+                    tPath = '\\'.join(tmp[0:-1]) + '\\'
+                    f.write(tmp[-1] + ' not in source file!target path is : ' + tPath
+                            + '\n         target ---> source\n')
+                    self.__targetFileList.remove(tar)
+        with open('out\\tFileDiff.log', 'w') as f:
+            for src in self.__sourceFileList:
+                if src not in self.__targetFileList:
+                    tmp = src.split('\\')
+                    sPath = '\\'.join(tmp[0:-1]) + '\\'
+                    f.write(tmp[-1] + ' not in source file!target path is : ' + sPath
+                            + '\n        source ---> target\n')
+                    self.__sourceFileList.remove(src)
 
     @staticmethod
-    def getFList(rootPath):
-        for __root, __dirs, __files in os.walk(rootPath):
-            print('root_dir:', __root)
-            print('sub_dirs:', __dirs)
-            print('files:', __files)
-
-    def fileExist(self):
-        if os.path.exists(self.file1) and os.path.exists(self.file2):
+    def fileExist(sFile, tFile):
+        if os.path.exists(sFile) and os.path.exists(tFile):
             return True
         else:
             return False
 
     def compare(self):
-        if not CompareFile(self.file1, self.file2).fileExist():
-            return []
+        for num in range(len(self.__sourceFileList)):
+            if self.fileExist(self.__sourceFileList[num], self.__targetFileList[num]):
+                pass
+            else:
+                pass
 
         fp1 = open(self.file1, encoding='utf-8')
         fp2 = open(self.file2, encoding='utf-8')
@@ -53,28 +82,13 @@ class CompareFile:
                 counter += 1
         return resultList
 
-
-# fileForCmp = CompareFile('C:\\Study_log\\test', 'C:\\Study_log\tet')
-# diff = fileForCmp.compare()
-# with open('output.log', 'w') as f:
-#     for i in diff:
-#         f.write(i)
-#         print(i)
-def list_all_files(rootdir):
-    import os
-    _files = []
-    _list = os.listdir(rootdir)  # 列出文件夹下所有的目录与文件
-    for _i in range(0, len(_list)):
-        path = os.path.join(rootdir, _list[_i])
-        if os.path.isdir(path):
-            _files.extend(list_all_files(path))
-        if os.path.isfile(path):
-            _files.append(path)
-    return _files
+    def listPrint(self):
+        with open('sourceList.log', 'w') as f:
+            for i in self.__sourceFileList:
+                f.write(i+'\n')
 
 
+a = CompareFile('test', 'venv')
 
-
-
-a = getFList('.idea')
-print(a)
+a.listPrint()
+a.fileDiff()

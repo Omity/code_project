@@ -20,6 +20,7 @@ class CompareFile:
     __targetFileList = []
     __compareFileList = []
     __compareDirList = []
+    __process = 0
 
     msgFileDiff = f'''/*******************************************************************************
 文件名称: fileDiff.log
@@ -54,6 +55,8 @@ class CompareFile:
             for name in file:
                 self.__sourceFileList.append(os.path.join(root, name))
             for name in dirs:
+                root = '\\'.join(root.split('\\')[root.split('\\')
+                                 .index(self.file1.split('\\')[-1]):])
                 tmp = '\\'.join(os.path.join(root, name).split('\\')[1:])
                 if tmp not in self.__compareDirList:
                     self.__compareDirList.append(tmp)
@@ -65,7 +68,8 @@ class CompareFile:
         with open('out\\fileDiff.log', 'w') as f:
             f.write(self.msgFileDiff + '\n\n\n\n')
             for tar in self.__targetFileList:
-                tarTmp = '\\'.join(tar.split('\\')[1:])
+                tarIndex = tar.split('\\').index(self.file2.split('\\')[-1])
+                tarTmp = '\\'.join(tar.split('\\')[tarIndex + 1:])
                 if (os.path.join(self.file1, tarTmp)) not in \
                         self.__sourceFileList:
                     tmp = tar.split('\\')
@@ -76,7 +80,8 @@ class CompareFile:
                     if tarTmp not in self.__compareFileList:
                         self.__compareFileList.append(tarTmp)
             for src in self.__sourceFileList:
-                srcTmp = '\\'.join(src.split('\\')[1:])
+                srcIndex = tar.split('\\').index(self.file2.split('\\')[-1])
+                srcTmp = '\\'.join(src.split('\\')[srcIndex + 1:])
                 if (os.path.join(self.file2, srcTmp)) not in \
                         self.__targetFileList:
                     tmp = src.split('\\')
@@ -111,6 +116,7 @@ class CompareFile:
             print('\033[31m读取失败!\033[0m\n')
 
     def compare(self):
+        print('\033[32m----开始进行比较----\033[0m')
         for dirs in self.__compareDirList:
             self.createFolder('out\\' + dirs)
         for file in self.__compareFileList:
@@ -140,18 +146,32 @@ class CompareFile:
                         continue
                     if x[0] != x[1]:
                         result = '%s和%s第%s行不同, 内容为: %s --> %s' % \
-                                 (self.file1, self.file2, counter, x[0].strip(), x[1].strip())
+                                 (self.file1 + '\\' + file, self.file2 + '\\'
+                                  + file, counter, x[0].strip(), x[1].strip())
                         with open(outTmp + '\\' + 'result.log', 'w') as f:
                             f.write(result)
                         counter += 1
+            self.__process = self.__compareFileList.index(file)
+            self.processOn()
+        print('\033[32m----已完成所有比较----\033[0m')
 
     @staticmethod
     def readMe():
         with open('out\\readme', 'w', encoding='utf-8') as f:
-            details = '''该类有两个传参,第一个是源文件目录,第二个是目标文件目录,目前仅支持和工程在同一目录级下
+            details = '''该类有两个传参,第一个是源文件目录,第二个是目标文件目录,可以相对路径，\
+            但是源文件和目标文件得在同一级下，
             输出物都保存在out文件下,以该类建立对象后,或者引用该类的compare函数,就可以完成功能.
             '''
             f.write(details)
 
+    def processOn(self):
+        tmp = round((self.__process + 1) / len(self.__compareFileList) * 100, 2)
+        print(f'已完成比较, 当前进度 ====>  \033[31m{tmp}\033[0m% / 100%')
 
-CompareFile('source', 'target').compare()
+    def printf(self):
+        print(self.__compareDirList)
+
+
+a = CompareFile('C:\\Study_log\\project_code\\pythonProject\\source',
+                'C:\\Study_log\\project_code\\pythonProject\\target')
+a.compare()

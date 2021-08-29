@@ -145,10 +145,12 @@ class CompareFile:
                         counter += 1
                         continue
                     if x[0] != x[1]:
-                        result = '%s和%s第%s行不同, 内容为: %s --> %s' % \
+                        result = '%s和%s第%s行不同, 内容为: \n%s --> %s' % \
                                  (self.file1 + '\\' + file, self.file2 + '\\'
                                   + file, counter, x[0].strip(), x[1].strip())
-                        with open(outTmp + '\\' + 'result.log', 'w') as f:
+                        print(result)
+                        with open(outTmp + '\\' + nameTmp[-1].split('.')[0] +
+                                  'result.log', 'w') as f:
                             f.write(result)
                         counter += 1
             self.__process = self.__compareFileList.index(file)

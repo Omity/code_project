@@ -1,3 +1,9 @@
-# 忽略远程仓库拷贝的文件
+# 忽略远程copy文件
 august_daily_code
 hello_world
+
+# 忽略编译文件
+
+*.ko
+module*
+*.out

@@ -4,6 +4,6 @@ hello_world
 
 # 忽略编译文件
 
-*.ko
-module*
+device/*.ko
+device/module*
 *.out

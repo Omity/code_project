@@ -7,6 +7,8 @@
 #include <linux/sysfs.h>
 #include <linux/types.h>
 #include <linux/version.h>
+#include <linux/ctype.h>
+
 
 /*******************************************************************************
  * 文件名称: hello_world.c
@@ -26,6 +28,8 @@ MODULE_VERSION("1.0");
 
 void helloRelease(struct kobject *kobject);
 static ssize_t helloShow(struct kobject *kobject, struct attribute *attr, char *buf);
+static ssize_t helloStore(struct device *dev, struct device_attribute *attr, const char *buf, size_t count);
+
 
 // 设备模型的数据结构
 /************************************kobject***********************************/
@@ -35,13 +39,13 @@ static struct kobject  *kob;
 /* kobject下的文件和权限*/
 struct attribute helloAttr = {
     .name = "kobj_config",
-    .mode = 0777,
+    .mode = 0666,
 }
 
 struct attribute helloLog = 
 {
     .name = "outlog"
-    .mode = 0777;
+    .mode = 0666;
 }
 
 
@@ -56,7 +60,7 @@ static struct attribute *defAttr[] =
 struct sysfs_ops helloOps = 
 {
     .show = helloShow,
-    .store = ,
+    .store = helloStore,
 }
 
 /* 填充kobject结构体 
@@ -74,28 +78,66 @@ void helloRelease(struct kobject *kobject)
     printk("release this kobject!\n");
 }
 
-int createKobject(void)
+
+static int convertToUpper(char *buf)
 {
-    kob = kobject_create_and_add("hello_test", kernel_kobj->parent);
+    int i;
+    if(NULL == *buf)
+    {
+        buf = "empty";
+    }
+    else if(!(isalpha(buf)))
+	{
+		buf = "invalid";
+	}
+	else
+	{
+		if((*buf >= 'a') && (*buf <= 'z'))
+		{
+			*buf = *buf - 32;
+		}
+	}
+	
+	return 0;
 }
 
-static char convertToUpper(char *buf)
-{
-    u16 i;
-    if
-}
-
-static ssize_t helloShow(struct kobject *kobject, struct attribute *attr, char *buf)
+/* sysfs_ops-> show */
+static ssize_t helloShow(struct kobject *kobject, struct attribute *attr \
+												, char *buf)
 {
     printk("A show operation start\n");
-    
-    sprintf(buf, "%s\n", attr->name);
+	return sprintf(buf, "%s\n", attr->name);
+	
 }
+
+/* sysfs_ops->store */
+static ssize_t helloStore(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+{
+	printk("A store operation start\n");
+    if(0 == convertToUpper(attr->name))
+	{
+		printk("helloStore success!\n");
+		sprintf(buf, "%s\n", attr->name);
+	}
+	else
+	{
+		printk("helloStore failed!\n");
+		sprintf(buf, "%s\n", "EOF");
+	}
+}
+	
 
 /* 初始化函数 */
 static int __init helloWorldInit(void)
 {
     printk("driver loading ........\n");
+	
+	kob = kobject_create_and_add("hello_test", kernel_kobj->parent);
+	if(!kob)
+	{
+		printk("kobject init failed!\n");
+		return -1;
+	}
     printk(KERN_INFO "hello world!\n");
     return 0;
 }
@@ -104,6 +146,7 @@ static int __init helloWorldInit(void)
 static void __exit helloWorldExit(void)
 {
     printk("driver unloading ......\n");
+	kobject_put(kob);
     printk(KERN_INFO "goodbye world!\n");
 }
 

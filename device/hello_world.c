@@ -26,9 +26,13 @@ MODULE_ALIAS("alias hello");
 MODULE_VERSION("1.0");
 
 
+#define IS_EMPTY    "empty"
+#define IS_INVALID  "invalid"
+
+
 void helloRelease(struct kobject *kobject);
 static ssize_t helloShow(struct kobject *kobject, struct attribute *attr, char *buf);
-static ssize_t helloStore(struct device *dev, struct device_attribute *attr, const char *buf, size_t count);
+static ssize_t helloStore(struct kobject *kobject, struct attribute *attr, const char *buf, size_t count);
 
 
 // 设备模型的数据结构
@@ -37,16 +41,17 @@ static struct kobject  *kob;
 //static struct kset     *kst;
 
 /* kobject下的文件和权限*/
-struct attribute helloAttr = {
+struct attribute helloAttr = 
+{
     .name = "kobj_config",
     .mode = 0666,
-}
+};
 
 struct attribute helloLog = 
 {
-    .name = "outlog"
-    .mode = 0666;
-}
+    .name = "outlog",
+    .mode = 0666,
+};
 
 
 /* 数组，代表kobject下可以有多个文件 */
@@ -54,14 +59,14 @@ static struct attribute *defAttr[] =
 {
     &helloAttr,
     NULL,
-}
+};
 
 /* 文件的操作 */
 struct sysfs_ops helloOps = 
 {
     .show = helloShow,
     .store = helloStore,
-}
+};
 
 /* 填充kobject结构体 
  * kobject 主要关注这个元素,也可以使用默认值
@@ -71,39 +76,17 @@ struct kobj_type helloKtype =
     .release = helloRelease,
     .sysfs_ops = &helloOps,
     .default_attrs = defAttr,
-}
+};
 
+/* kobject release */
 void helloRelease(struct kobject *kobject)
 {
     printk("release this kobject!\n");
 }
 
 
-static int convertToUpper(char *buf)
-{
-    int i;
-    if(NULL == *buf)
-    {
-        buf = "empty";
-    }
-    else if(!(isalpha(buf)))
-	{
-		buf = "invalid";
-	}
-	else
-	{
-		if((*buf >= 'a') && (*buf <= 'z'))
-		{
-			*buf = *buf - 32;
-		}
-	}
-	
-	return 0;
-}
-
 /* sysfs_ops-> show */
-static ssize_t helloShow(struct kobject *kobject, struct attribute *attr \
-												, char *buf)
+static ssize_t helloShow(struct kobject *kobject, struct attribute *attr , char *buf)
 {
     printk("A show operation start\n");
 	return sprintf(buf, "%s\n", attr->name);
@@ -111,42 +94,51 @@ static ssize_t helloShow(struct kobject *kobject, struct attribute *attr \
 }
 
 /* sysfs_ops->store */
-static ssize_t helloStore(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+static ssize_t helloStore(struct kobject *kobject, struct attribute *attr, const char *buf, size_t count)
 {
+	const char* p = buf;
 	printk("A store operation start\n");
-    if(0 == convertToUpper(attr->name))
+    if(NULL == buf)
 	{
 		printk("helloStore success!\n");
-		sprintf(buf, "%s\n", attr->name);
+		attr->name = IS_EMPTY;
+		//sprintf(attr->name, "%s\n", EMPTY);
+	}
+	else if((*buf < 'A') || (*buf > 'z'))
+	{
+		printk("helloStore failed!\n");
+		attr->name = IS_INVALID;
+		//sprintf(attr->name, "%s\n", "EOF");
 	}
 	else
 	{
-		printk("helloStore failed!\n");
-		sprintf(buf, "%s\n", "EOF");
+		attr->name = p;
 	}
+	
+	return count;
 }
 	
 
 /* 初始化函数 */
-static int __init helloWorldInit(void)
+static int helloWorldInit(void)
 {
+	int ret;
     printk("driver loading ........\n");
 	
-	kob = kobject_create_and_add("hello_test", kernel_kobj->parent);
-	if(!kob)
+	ret = kobject_init_and_add(kob, &helloKtype, kernel_kobj->parent, "hello_test");
+	if(!ret)
 	{
-		printk("kobject init failed!\n");
-		return -1;
+		printk("kobject init failed in %d\n", ret);
 	}
     printk(KERN_INFO "hello world!\n");
     return 0;
 }
 
 /* 卸载函数 */
-static void __exit helloWorldExit(void)
+static void helloWorldExit(void)
 {
     printk("driver unloading ......\n");
-	kobject_put(kob);
+	kobject_del(kob);
     printk(KERN_INFO "goodbye world!\n");
 }
 

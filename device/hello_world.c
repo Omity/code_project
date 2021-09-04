@@ -125,11 +125,12 @@ static int helloWorldInit(void)
 {
 	int ret;
     printk("driver loading ........\n");
-	
-	ret = kobject_init_and_add(kob, &helloKtype, kernel_kobj->parent, "hello_test");
-	if(!ret)
+	kob = kobject_create_and_add("hello_test", kernel_kobj->parent);
+	//ret = kobject_init_and_add(kob, &helloKtype, kernel_kobj->parent, "hello_test");
+	if(!kob)
 	{
-		printk("kobject init failed in %d\n", ret);
+		printk("kobject init failed\n");
+		return 1;
 	}
     printk(KERN_INFO "hello world!\n");
     return 0;
@@ -139,7 +140,7 @@ static int helloWorldInit(void)
 static void helloWorldExit(void)
 {
     printk("driver unloading ......\n");
-	kobject_del(kob);
+	kobject_put(kob);
     printk(KERN_INFO "goodbye world!\n");
 }
 

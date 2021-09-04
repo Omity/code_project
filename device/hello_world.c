@@ -47,11 +47,6 @@ struct attribute helloAttr =
     .mode = 0666,
 };
 
-struct attribute helloLog = 
-{
-    .name = "outlog",
-    .mode = 0666,
-};
 
 
 /* 数组，代表kobject下可以有多个文件 */
@@ -89,6 +84,7 @@ void helloRelease(struct kobject *kobject)
 static ssize_t helloShow(struct kobject *kobject, struct attribute *attr , char *buf)
 {
     printk("A show operation start\n");
+    printk("read from attr->name :%s\n", attr->name);
 	return sprintf(buf, "%s\n", attr->name);
 	
 }
@@ -96,15 +92,17 @@ static ssize_t helloShow(struct kobject *kobject, struct attribute *attr , char 
 /* sysfs_ops->store */
 static ssize_t helloStore(struct kobject *kobject, struct attribute *attr, const char *buf, size_t count)
 {
-	const char* p = buf;
+	char* p = NULL;
 	printk("A store operation start\n");
-    if(NULL == buf)
+	
+	sscanf(buf, "%s", p);
+    if(NULL == p)
 	{
 		printk("helloStore success!\n");
 		attr->name = IS_EMPTY;
 		//sprintf(attr->name, "%s\n", EMPTY);
 	}
-	else if((*buf < 'A') || (*buf > 'z'))
+	else if((*p < 'A') || (*p > 'z'))
 	{
 		printk("helloStore failed!\n");
 		attr->name = IS_INVALID;
@@ -112,12 +110,15 @@ static ssize_t helloStore(struct kobject *kobject, struct attribute *attr, const
 	}
 	else
 	{
-		attr->name = p;
+		attr->name = "right";
 	}
+	 p = NULL;
+	printk("write: %s\n", attr->name);
 	
 	return count;
 }
-	
+/***********************************kobject************************************/
+
 
 /* 初始化函数 */
 static int helloWorldInit(void)

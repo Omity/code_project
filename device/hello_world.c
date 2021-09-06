@@ -1,14 +1,17 @@
 #include <linux/device.h>
-#include <linux/init.h>
+#include <linux/hardirq.h>
+#include <linux/kdev_t.h>
 #include <linux/kernel.h>
-#include <linux/kobject.h>
 #include <linux/module.h>
-#include <linux/moduleparam.h>
 #include <linux/string.h>
 #include <linux/sysfs.h>
-#include <linux/types.h>
-#include <linux/version.h>
-#include <linux/ctype.h>
+#include <linux/sched.h>
+#include <linux/slab.h>
+
+#undef pr_fmt
+#define pr_fmt(fmt) "[%d] %s: %s:%d " fmt, in_interrupt() ? 0 : task_pid_vnr(current), LOG_TAG, __func__, __LINE__
+#undef CDBG
+#define CDBG(fmt, args...) pr_info(fmt, ##args)
 
 
 /*******************************************************************************
@@ -32,14 +35,15 @@ MODULE_VERSION("1.0");
 
 
 void helloRelease(struct kobject *kobject);
-static ssize_t helloShow(struct kobject *kobject, struct attribute *attr, char *buf);
-static ssize_t helloStore(struct kobject *kobject, struct attribute *attr, const char *buf, size_t count);
+static ssize_t helloShow(struct device *dev, struct device_attribute *dev_attr, char *buf);
+static ssize_t helloStore(struct device *dev, struct device_attribute *dev_attr, const char *buf, size_t count);
 
 
 // 设备模型的数据结构
 /************************************kobject***********************************/
 
-static DEVICE_ATTR(kobject_device, 0666, helloShow, helloStore);         /* 建立设备节点 */
+/* 建立设备节点 */
+static DEVICE_ATTR(kobject_device, 0664, helloShow, helloStore); 
 
 /* 数组，属性添加 */
 static struct attribute *defAttr[] =
@@ -51,29 +55,22 @@ static struct attribute *defAttr[] =
     NULL,
 };
 
-static struct attrbute_group attr_group = 
+static struct attribute_group attr_group = 
 {
     .attrs = defAttr,
-}
-
-/* kobject release */
-void helloRelease(struct kobject *kobject)
-{
-    printk("release this kobject!\n");
-}
-
+};
 
 /* sysfs_ops-> show */
-static ssize_t helloShow(struct kobject *kobject, struct attribute *attr , char *buf)
+static ssize_t helloShow(struct device *dev, struct device_attribute *dev_attr , char *buf)
 {
     printk("A show operation start\n");
-    printk("read from attr->name :%s\n", attr->name);
-	return sprintf(buf, "%s\n", attr->name);
+    printk("read from attr->name :%s\n", dev_attr->attr.name);
+	return sprintf(buf, "%s\n", dev_attr->attr.name);
 	
 }
 
 /* sysfs_ops->store */
-static ssize_t helloStore(struct kobject *kobject, struct attribute *attr, const char *buf, size_t count)
+static ssize_t helloStore(struct device *dev, struct device_attribute *dev_attr, const char *buf, size_t count)
 {
 	char* p = NULL;
 	printk("A store operation start\n");
@@ -82,28 +79,28 @@ static ssize_t helloStore(struct kobject *kobject, struct attribute *attr, const
     if(NULL == p)
 	{
 		printk("helloStore success!\n");
-		attr->name = IS_EMPTY;
+		dev_attr->attr.name = IS_EMPTY;
 		//sprintf(attr->name, "%s\n", EMPTY);
 	}
 	else if((*p < 'A') || (*p > 'z'))
 	{
 		printk("helloStore failed!\n");
-		attr->name = IS_INVALID;
+		dev_attr->attr.name = IS_INVALID;
 		//sprintf(attr->name, "%s\n", "EOF");
 	}
 	else
 	{
-		attr->name = "right";
+		dev_attr->attr.name = "right";
 	}
 	 p = NULL;
-	printk("write: %s\n", attr->name);
+	printk("write: %s\n", dev_attr->attr.name);
 	
 	return count;
 }
 /***********************************kobject************************************/
 
-static struct class *thisClass;
-static struct device *thisDevice;
+static struct class *thisClass = NULL;
+static struct device *thisDevice = NULL;
 
 /* 初始化函数 */
 static int helloWorldInit(void)
@@ -117,7 +114,7 @@ static int helloWorldInit(void)
     thisDevice = device_create(thisClass, NULL, MKDEV(0, 0), NULL, "hello_device");
     ret = IS_ERR(ptr_err = thisDevice);
 
-    ret = sys_create_group(&thisDevice->kobj, &attr_group);
+    ret = sysfs_create_group(&thisDevice->kobj, &attr_group);
     printk(KERN_INFO "hello world!\n");
     return ret;
 }
@@ -126,7 +123,7 @@ static int helloWorldInit(void)
 static void helloWorldExit(void)
 {
     printk("driver unloading ......\n");
-	sys_remove_group(&thisDevice->kobj, &attr_group);
+	sysfs_remove_group(&thisDevice->kobj, &attr_group);
     device_destroy(thisClass, MKDEV(0, 0));
     class_destroy(thisClass);
     printk(KERN_INFO "goodbye world!\n");

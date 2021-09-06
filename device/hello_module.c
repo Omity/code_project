@@ -65,7 +65,6 @@ static struct attribute_group attr_group = {
 
 static struct class *adil_class = NULL;
 static struct device *adil_dev = NULL;
-struct adil_demo_data *test_data;
 
 static int __init example_init(void)
 {
@@ -100,7 +99,6 @@ static void __exit example_exit(void)
     sysfs_remove_group(&adil_dev->kobj, &attr_group);
     device_destroy(adil_class, MKDEV(0, 0));
     class_destroy(adil_class);
-    kfree(test_data);
 
     CDBG("... %s() ...\n", __func__);
 }

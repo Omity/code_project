@@ -1,3 +1,4 @@
+#include <linux/device.h>
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/kobject.h>
@@ -37,41 +38,23 @@ static ssize_t helloStore(struct kobject *kobject, struct attribute *attr, const
 
 // 设备模型的数据结构
 /************************************kobject***********************************/
-static struct kobject  *kob;
-//static struct kset     *kst;
 
-/* kobject下的文件和权限*/
-struct attribute helloAttr = 
-{
-    .name = "kobj_config",
-    .mode = 0666,
-};
+static DEVICE_ATTR(kobject_device, 0666, helloShow, helloStore);         /* 建立设备节点 */
 
-
-
-/* 数组，代表kobject下可以有多个文件 */
+/* 数组，属性添加 */
 static struct attribute *defAttr[] =
 {
-    &helloAttr,
+    /* #define DEVICE_ATTR(_name, _mode, _show, _store) /
+     * struct device_attribute dev_attr_##_name = __ATTR(_name, _mode, _show, _store)
+     */
+    &dev_attr_kobject_device.attr,   //DEVICE_ATTR 函数创建的前缀就是dev_attr_ + name 
     NULL,
 };
 
-/* 文件的操作 */
-struct sysfs_ops helloOps = 
+static struct attrbute_group attr_group = 
 {
-    .show = helloShow,
-    .store = helloStore,
-};
-
-/* 填充kobject结构体 
- * kobject 主要关注这个元素,也可以使用默认值
- */
-struct kobj_type helloKtype =
-{
-    .release = helloRelease,
-    .sysfs_ops = &helloOps,
-    .default_attrs = defAttr,
-};
+    .attrs = defAttr,
+}
 
 /* kobject release */
 void helloRelease(struct kobject *kobject)
@@ -119,28 +102,33 @@ static ssize_t helloStore(struct kobject *kobject, struct attribute *attr, const
 }
 /***********************************kobject************************************/
 
+static struct class *thisClass;
+static struct device *thisDevice;
 
 /* 初始化函数 */
 static int helloWorldInit(void)
 {
+    void* ptr_err;
 	int ret;
     printk("driver loading ........\n");
-	kob = kobject_create_and_add("hello_test", kernel_kobj->parent);
-	//ret = kobject_init_and_add(kob, &helloKtype, kernel_kobj->parent, "hello_test");
-	if(!kob)
-	{
-		printk("kobject init failed\n");
-		return 1;
-	}
+	thisClass = class_create(THIS_MODULE, "hello_class");
+    ret = IS_ERR(ptr_err = thisClass);
+    
+    thisDevice = device_create(thisClass, NULL, MKDEV(0, 0), NULL, "hello_device");
+    ret = IS_ERR(ptr_err = thisDevice);
+
+    ret = sys_create_group(&thisDevice->kobj, &attr_group);
     printk(KERN_INFO "hello world!\n");
-    return 0;
+    return ret;
 }
 
 /* 卸载函数 */
 static void helloWorldExit(void)
 {
     printk("driver unloading ......\n");
-	kobject_put(kob);
+	sys_remove_group(&thisDevice->kobj, &attr_group);
+    device_destroy(thisClass, MKDEV(0, 0));
+    class_destroy(thisClass);
     printk(KERN_INFO "goodbye world!\n");
 }
 

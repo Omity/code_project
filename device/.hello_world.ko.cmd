@@ -1,0 +1,1 @@
+cmd_/home/sn02241/test/device/hello_world.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/sn02241/test/device/hello_world.ko /home/sn02241/test/device/hello_world.o /home/sn02241/test/device/hello_world.mod.o

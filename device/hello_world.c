@@ -72,27 +72,8 @@ static ssize_t helloShow(struct device *dev, struct device_attribute *dev_attr ,
 /* sysfs_ops->store */
 static ssize_t helloStore(struct device *dev, struct device_attribute *dev_attr, const char *buf, size_t count)
 {
-	char* p = NULL;
+
 	printk("A store operation start\n");
-	
-	sscanf(buf, "%s", p);
-    if(NULL == p)
-	{
-		printk("helloStore success!\n");
-		dev_attr->attr.name = IS_EMPTY;
-		//sprintf(attr->name, "%s\n", EMPTY);
-	}
-	else if((*p < 'A') || (*p > 'z'))
-	{
-		printk("helloStore failed!\n");
-		dev_attr->attr.name = IS_INVALID;
-		//sprintf(attr->name, "%s\n", "EOF");
-	}
-	else
-	{
-		dev_attr->attr.name = "right";
-	}
-	 p = NULL;
 	printk("write: %s\n", dev_attr->attr.name);
 	
 	return count;

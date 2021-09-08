@@ -78,7 +78,7 @@ static unsigned short rigol_kbd_knob_value_get(unsigned long long u64KeyValue)
 		case 0:
 			if(u8KnobValueNew == 2)
 			{
-				s16Left++;kbdGetAndReportKey
+				s16Left++;
 			}
 			else if(u8KnobValueNew == 1)
 			{
@@ -125,11 +125,12 @@ static unsigned short rigol_kbd_knob_value_get(unsigned long long u64KeyValue)
   * 返 回 值：错误码
   * 说    明：外部函数
  ******************************************************************************/
-static int rigol_kbd_parse_key(unsigned long long *u64keyValue, unsigned int *u32keycode, unsigned int *u32keystate)
+static int rigol_kbd_parse_key(unsigned long long *pu64keyValue, unsigned int *pu32keycode, 
+unsigned int *pu32keystate, unsigned int *pu32LongKeyCount)
 {
     int s32Ret = -1;
 	int i = 0;
-    unsigned long long u64KeyValueNew = *u64keyValue;
+    unsigned long long u64KeyValueNew = *pu64keyValue;
 
     // 确认按键值有没有变化（亦或相同为0, 不同为1）
     unsigned long long u64KeyMask = 0; 
@@ -137,15 +138,20 @@ static int rigol_kbd_parse_key(unsigned long long *u64keyValue, unsigned int *u3
     u64KeyMask = u64KeyValueNew ^ g_u64KeyValueOld;
     
     //两次按键值没有改变，说明是重复数据（按下和抬起的键值不同）
-    if((u64KeyMask == 0) || (u32keystate != 1))
+    if(u64KeyMask == 0)
     {
-        key_debug("==============  no change key============== \n");
+        // 用户按下长按键
+        ++(*pu32LongKeyCount);
         return s32Ret;
     }
 
+ 
     //1->0 means down,0->1 means release
-    *u32keystate = (u64KeyValueNew & u64KeyMask) ? KEY_STATE_REL : KEY_STATE_DN;
-    *u32keycode  = RIGOL_KBD_KEY_INVALID;
+    *pu32keystate = (u64KeyValueNew & u64KeyMask) ? KEY_STATE_REL : KEY_STATE_DN;
+    *pu32keycode  = RIGOL_KBD_KEY_INVALID;
+
+    // 如果键值有变化，计数器清零
+    *pu32LongKeyCount = 0;
 
     
     //菜单键（按键所属区域的判定）
@@ -156,9 +162,9 @@ static int rigol_kbd_parse_key(unsigned long long *u64keyValue, unsigned int *u3
 		{
             
 			s32Ret = 0;
-			*u32keycode = rigol_keycodes[i];
+			*pu32keycode = rigol_keycodes[i];
     		// set current key value as last key value.
-    		g_u64KeyValueOld = *u64keyValue;
+    		g_u64KeyValueOld = *pu64keyValue;
 			return s32Ret;
 		}
 	}
@@ -170,7 +176,7 @@ static int rigol_kbd_parse_key(unsigned long long *u64keyValue, unsigned int *u3
 		//判断为旋钮
 		s32Ret = 0;
 		key_debug("knob: 0x%llx-0x%llx!\n", u64KeyValueNew, u64KeyMask);
-		*u32keycode = rigol_kbd_knob_value_get(u64KeyValueNew);
+		*pu32keycode = rigol_kbd_knob_value_get(u64KeyValueNew);
 	}
 	else
 	{
@@ -178,7 +184,7 @@ static int rigol_kbd_parse_key(unsigned long long *u64keyValue, unsigned int *u3
 	}
 
     // set current key value as last key value.
-    g_u64KeyValueOld = *u64keyValue;
+    g_u64KeyValueOld = *pu64keyValue;
     return s32Ret;
 }
 
@@ -199,30 +205,23 @@ static int kbdGetAndReportKey(unsigned char *pu8keybuf)
 
     int i = 0;
     // 获取的按键值
-    unsigned int u32keycode = 0;
+    static unsigned int u32keycode = 0;
     // 获取的键值缓存值
     unsigned long long u64KeyTempValue = 0;
     // 获取的按键状态
-    unsigned int u32keystate = 0;
-    // 键值的临时版本号
-    unsigned char  u32TmpVersion = 0;
+    unsigned int u32keystate = KEY_STATE_DN;
+    // 长按键计数器
+    static unsigned int  u32LongKeyCount = 0;
     memcpy(&u64KeyTempValue, pu8keybuf, KEY_VALID_LEN); 
  
-    //长按键
-    char *ps8IsLongKey = NULL;       //add at 2021年09月06日16:27:32
  
     /* mask the unused key first */
     u64KeyTempValue |= KEY_UNUSED_MASK;
     
-    // 用户按下长按键
-    if( KEY_VER_FLAG == pu8keybuf[KEY_VER_POS])
-    {
-        u32keystate = KEY_LONG_FLAG;
-    }
     // 按键解析函数
-    s32Ret = rigol_kbd_parse_key(&u64KeyTempValue, &u32keycode, &u32keystate);
+    s32Ret = rigol_kbd_parse_key(&u64KeyTempValue, &u32keycode, &u32keystate, &u32LongKeyCount);
     
-    if(!s32Ret && u32keycode != RIGOL_KBD_KEY_INVALID)
+    if(((!s32Ret) || (u32LongKeyCount > KEY_LONG_FLAG) ) && (u32keycode != RIGOL_KBD_KEY_INVALID))
     {
 		//判断是否为旋钮，判断依据是：检测旧值与新值比较变化的位是否为knob的掩码（两个）
 		if(u32keycode == RIGOL_KBD_KEY_KONB_LEFT)
@@ -246,22 +245,20 @@ static int kbdGetAndReportKey(unsigned char *pu8keybuf)
 			{
 				if((u32keycode) == rigol_keycodes[i])
 				{
-                    //是否长按键
-                    if(KEY_VER_FLAG == pu8keybuf[KEY_VER_POS]) 
-                    {                        
-                        ps8IsLongKey = strcat((char*)rigol_keycodes_debug_string[i], IS_LONG_KEY);
-                        key_debug("%s button, %s\n", ps8IslongKey, u32keystate?"down":"release");
-                    }
-                    else
-                    {
-                        key_debug("%s button, %s\n", ps8IslongKey,rigol_keycodes_debug_string[i],
-														 u32keystate?"down":"release");
-                    }
-					break;
-				
-			}
-        }
-    }
+                    			//是否长按键
+                    			if(u32LongKeyCount > KEY_LONG_FLAG) 
+                    			{                        
+                        			key_debug("long_");
+						u32LongKeyCount = 0;
+					}
+                        		key_debug("%s button, %s\n", rigol_keycodes_debug_string[i], u32keystate?"down":"release");
+                        			
+                    			
+						break;
+                		}
+            			}
+        		}
+   		}
     return s32Ret;
 }
 
@@ -394,8 +391,7 @@ void *PhareDataThread(void*  pvResvData)
 
         //信号量+1，进而触发Resv的任务
 	sem_post(&g_pstkeyDeal->semUartResv);
-    }
-		
+    }		
 }
 
 

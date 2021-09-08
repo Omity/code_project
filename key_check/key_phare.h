@@ -46,13 +46,12 @@
 #define CRC4_POLYNOMIAL         0x13         //CRC4生成多项式系数
 #define KEY_CRC4_LEN            1            //校验码长度，1字节
 
+/* 长按键 */
+#define KEY_LONG_FLAG            3         // 长按键标志位
 
-#define KEY_LONG_FLAG            1         // 长按键标志位
-#define KEY_VER_FLAG            0x1f       // 长按键键值标志位
-#define KEY_VER_POS            KEY_HD_LEN + KEY_VALID_LEN       // 键盘板版本位置
 #define KEY_CRC4_POS            KEY_HD_LEN + KEY_VALID_LEN + KEY_VER_LEN  // 校验码位置
 
-//键值一帧数据长度，10bytes：1byte帧头 + 7bytes键值 + 1byte版本号 + 1byte CRC校验码
+//键值一帧数据长度，10bytes：1byte帧头 + 7bytes键值 + 1byte长按键 + 1byte CRC校验码
 #define KEY_FRAME_LEN           (KEY_HD_LEN + KEY_VALID_LEN + KEY_VER_LEN + KEY_CRC4_LEN) //10
 
 /* 根据原理图和PCB定义各行列键值对应的键值掩码，(Col, Row)
@@ -245,7 +244,6 @@
 #define RIGOL_KBD_KEY_KONB_LEFT    BTN_TRIGGER_HAPPY31 // konb_left
 #define RIGOL_KBD_KEY_KONB_RIGHT   BTN_TRIGGER_HAPPY32 // konb_right
 
-#define IS_LONG_KEY             "_longkey"       //add at 2021年09月06日16:37:41
 
 #define KEY_UNKNOWN  240
 #define RIGOL_KBD_KEY_INVALID   KEY_UNKNOWN
@@ -333,7 +331,8 @@ static unsigned short rigol_kbd_knob_value_get(unsigned long long u64KeyValue);
   * 返 回 值：错误码
   * 说    明：外部函数
  ******************************************************************************/
-static int rigol_kbd_parse_key(unsigned long long*u64keyValue, unsigned int *u32keycode, unsigned int *u32keystate);
+static int rigol_kbd_parse_key(unsigned long long *u64keyValue, unsigned int *u32keycode, 
+unsigned int *u32keystate, unsigned int *u32LongKeyCount);
 
 
 

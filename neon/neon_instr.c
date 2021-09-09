@@ -28,10 +28,11 @@
 #include <arm_neon.h>
 
 #define PIXEL      256
-#define RGB_SIZE   1024
+#define RGB_SIZE   4096
 
 void rgb_c(uint8_t *r, uint8_t *g, uint8_t *b, uint8_t *rgb, int lenColor);
 void rgb_neon(uint8_t *r, uint8_t *g, uint8_t *b, uint8_t *rgb, int lenColor);
+int random_num(uint8_t n, uint8_t *arr, int count);
 
 int main(int argc, char **argv)
 {
@@ -43,19 +44,22 @@ int main(int argc, char **argv)
     struct timeval endTime;
     double timeUsed;
     
-    gettimeofday(&startTime, NULL);
-    cSin(data);
-    gettimeofday(&endTime, NULL);
-    timUsed = (startTime.tv_sec - endTime.tv_sec) + 
-              (double)(startTime.tv_usec - endTime.tv_usec) / 1000000.0;
-    printf("cSin use time: lf\n", timeUsed);
+    random_num(PIXEL, &rgb, RGB_SIZE);
     
     gettimeofday(&startTime, NULL);
-    neonSin(data);
+    rgb_c(&r, &g, &b, &rgb, RGB_SIZE / 3);
     gettimeofday(&endTime, NULL);
     timUsed = (startTime.tv_sec - endTime.tv_sec) + 
               (double)(startTime.tv_usec - endTime.tv_usec) / 1000000.0;
-    printf("neonSin use time: lf\n", timeUsed);
+    printf("rgb_c use time: lf\n", timeUsed);
+    
+    gettimeofday(&startTime, NULL);
+    rgb_neon(&r, &g, &b, &rgb, RGB_SIZE / 3);
+    gettimeofday(&endTime, NULL);
+    timUsed = (startTime.tv_sec - endTime.tv_sec) + 
+              (double)(startTime.tv_usec - endTime.tv_usec) / 1000000.0;
+    printf("rgb_neon use time: lf\n", timeUsed);
+    
 	return 0;
 }
 
@@ -77,7 +81,7 @@ void rgb_neon(uint8_t *r, uint8_t *g, uint8_t *b, uint8_t *rgb, int lenColor)
     uint8x16x3_t intlv_rgb;
     for (int i=0; i < num8x16; i++) 
     {
-        intlv_rgb = vld3q_u8(rgb+3*16*i);   //将8位数据每16个一个寄存器，放到连续的3个寄存器
+        intlv_rgb = vld3q_u8(rgb+3*16*i);   //将8位数据每16个一个寄存器，放到连续的3个FPU寄存器
         vst1q_u8(r+16*i, intlv_rgb.val[0]); //将一维向量写入CPU内存中
         vst1q_u8(g+16*i, intlv_rgb.val[1]);
         vst1q_u8(b+16*i, intlv_rgb.val[2]);
@@ -91,7 +95,7 @@ int random_num(uint8_t n, uint8_t *arr, int count)
     for(i = 0; i < count; i++)
     {
         uint8_t rand = rand() % n;
-        rgb[i] = rand;
+        arr[i] = rand;
     }
     
     return 0;

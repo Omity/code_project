@@ -48,6 +48,7 @@
 
 /* 长按键 */
 #define KEY_LONG_FLAG            3         // 长按键标志位
+#define COUNT_IS_FULL            255       // 长按键count值满
 
 #define KEY_CRC4_POS            KEY_HD_LEN + KEY_VALID_LEN + KEY_VER_LEN  // 校验码位置
 
@@ -160,7 +161,7 @@
 /* 按键状态*/
 #define KEY_STATE_REL    0
 #define KEY_STATE_DN     1
-#define KEY_STATE_HOLD   2
+#define KEY_STATE_LONG   2
 
 /* linux系统下,按键值不能超过KEY_MAX(0x2ff),所以,保能将按键映射在现有的键值上, 摘自input.h.
  * (最好映射在标准键盘上,这样标准键盘也可控制仪器)
@@ -284,6 +285,13 @@ static unsigned char rigol_keycodes_debug_string[KEY_COUNT][20] = {
     "store",     "back",        "dir-down" , "enter",     "knob key",
 };
 #endif
+
+//按键状态数组
+static unsigned char rigol_key_state[3] = {
+	"release", 
+	"down",
+	"longkey",
+};
 
 /* 上次按键值 */
 static unsigned long long g_u64KeyValueOld = 0xFFFFFFFFFFFFFFFF;

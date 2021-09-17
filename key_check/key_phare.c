@@ -221,7 +221,7 @@ static int kbdGetAndReportKey(unsigned char *pu8keybuf)
     // 按键解析函数
     s32Ret = rigol_kbd_parse_key(&u64KeyTempValue, &u32keycode, &u32keystate, &u32LongKeyCount);
     
-    if(((!s32Ret) || (u32LongKeyCount > KEY_LONG_FLAG) ) && (u32keycode != RIGOL_KBD_KEY_INVALID))
+    if(((!s32Ret) || (u32LongKeyCount >= KEY_LONG_FLAG) ) && (u32keycode != RIGOL_KBD_KEY_INVALID))
     {
 		//判断是否为旋钮，判断依据是：检测旧值与新值比较变化的位是否为knob的掩码（两个）
 		if(u32keycode == RIGOL_KBD_KEY_KONB_LEFT)
@@ -245,20 +245,24 @@ static int kbdGetAndReportKey(unsigned char *pu8keybuf)
 			{
 				if((u32keycode) == rigol_keycodes[i])
 				{
-                    			//是否长按键
-                    			if(u32LongKeyCount > KEY_LONG_FLAG) 
-                    			{                        
-                        			key_debug("long_");
-						u32LongKeyCount = 0;
+					//是否为释放
+					if(KEY_STATE_REL == u32keystate)
+					{
+						u32LongKeyCount = 0;    //释放状态时清除count
 					}
-                        		key_debug("%s button, %s\n", rigol_keycodes_debug_string[i], u32keystate?"down":"release");
-                        			
-                    			
-						break;
-                		}
-            			}
-        		}
-   		}
+					//是否长按键
+					if(u32LongKeyCount > KEY_LONG_FLAG) 
+					{                        
+						key_debug("long_");
+						u32LongKeyCount = (COUNT_IS_FULL == u32LongKeyCount)? KEY_LONG_FLAG : u32LongKeyCount;  //避免count值溢出
+						u32keystate = KEY_STATE_LONG;    //长按键状态
+					}
+					key_debug("%s button, %s\n", rigol_keycodes_debug_string[i], rigol_key_state[u32keystate]);
+					break;
+				}
+			}
+		}
+	}
     return s32Ret;
 }
 

@@ -1,9 +1,0 @@
-# 忽略远程copy文件
-august_daily_code
-hello_world
-
-# 忽略编译文件
-
-device/*.ko
-device/module*
-*.out

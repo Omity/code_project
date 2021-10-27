@@ -318,10 +318,19 @@ static int trig_in_irq_register(struct gpioData *pData, int gpio_in, unsigned lo
 /* 注销中断 */
 static int trig_in_irq_deregister(struct gpioData *pData, int gpio_in)
 {
+	gpio_free(pData->gpio_in[gpio_in]);
 	free_irq(pData->gpio_irq[gpio_in], NULL);
 }
 
 /* ioctl 函数 */
+/*
+ * 
+ * name: gpio_trig_ioctl
+ * @param struct file *filp, unsigned int cmd, unsigned long arg
+ * @return 
+ * @description IO命令,当使用out时中断关闭, 使用in时out对应脚默认置低       
+ */
+
 static long gpio_trig_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
   int ret = 0;

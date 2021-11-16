@@ -17,7 +17,6 @@
  * 
  */
 
-
  
 /* 头文件定义 */
 #include <linux/module.h>
@@ -87,6 +86,7 @@ static struct pci_device_id hello_ids[] = {
     {HELLO_VENDOR_ID,HELLO_DEVICE_ID,PCI_ANY_ID,PCI_ANY_ID,0,0,0},
     {0,}
 };
+
 /*一般用于热插拔设备中,将后者的结构输出到用户空间,这样模块加载是就知道什么模块对应什么硬件设备
  * 用法是MODULE_DEVICE_TABLE(设备类型,设备列表)
  */

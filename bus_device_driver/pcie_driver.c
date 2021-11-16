@@ -1,5 +1,17 @@
 /* 该函数取自网上分享的PCIe代码,仅供学习 */
 
+/* 流程:(来自kernel.org官网)
+ * Enable the device
+ * Request MMIO/IOP resources
+ * Set the DMA mask size (for both coherent and streaming DMA)
+ * Allocate and initialize shared control data (pci_allocate_coherent())
+ * Access device configuration space (if needed)
+ * Register IRQ handler (request_irq())
+ * Initialize non-PCI (i.e. LAN/SCSI/etc parts of the chip)
+ * Enable DMA/processing engines.
+ * 本文不一定按照该流程，后续会继续更改
+ */
+
 
 /* 函数描述: 基本的PCIE驱动程序，实现以下模块
  * 初始化设备、设备打开、数据读写和控制、中断处理、设备释放、设备卸载。
@@ -12,9 +24,15 @@
  * pci_read_config_byte/word/dword(struct pci_dev *pdev, int offset, int *value);
  * pci_write_config_byte/word/dword(struct pci_dev *pdev, int offset, int *value);
  * 
- * 获取I/O或内存资源
+ * 返回六个PCI I/O区域之一的第一个地址
  * pci_resource_start(struct pci_dev *dev,  int bar); Bar值的范围为0-5,若是PCI桥,则是0-1
  * 
+ * 申请/释放I/O或内存资源
+ * int pci_request_regions(struct pci_dev *pdev, const char *res_name);
+ * void pci_release_regions(struct pci_dev *pdev);
+ * 
+ * 在设备的能力表中寻找指定能力
+ * int pci_find_capability(struct pci_dev *pdev, int cap);
  */
 
  
@@ -82,6 +100,8 @@ dma_addr_t dma_dst_vir;
 //根据设备的id填写,这里假设厂商id和设备id
 #define HELLO_VENDOR_ID 0x666
 #define HELLO_DEVICE_ID 0x999
+
+/* 指明该驱动适用于哪一些PCI设备 */
 static struct pci_device_id hello_ids[] = {
     {HELLO_VENDOR_ID,HELLO_DEVICE_ID,PCI_ANY_ID,PCI_ANY_ID,0,0,0},
     {0,}
@@ -103,7 +123,7 @@ void iATU_write_config_dword(struct pci_dev *pdev,int offset,int value)
 }
  
 //假设需要将bar0映射到内存
-static void iATU_bar0(void)
+static void iATU_bar0(void)       //ATU 地址转换单元
 {
 	//下面几步，在手册中有example
 	//iATU_write_config_dword(my_device.pci_dev,iATU Lower Target Address ,xxx);//xxx表示内存中的地址，将bar0映射到这块内存
@@ -221,6 +241,7 @@ static int hello_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 	
 	//申请一块DMA内存，作为目的地址，在进行DMA读写的时候会用到。
+	//pci_alloc_consistent最大一次申请4MB
 	dma_dst_vir=(dma_addr_t)pci_alloc_consistent(pdev,DMA_BUFFER_SIZE,&dma_dst_phy);
 	if(dma_dst_vir!=0){
 		for(i=0;i<DMA_BUFFER_SIZE/PAGE_SIZE;i++){
@@ -229,7 +250,8 @@ static int hello_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	} else {
 		goto alloc_dma_src_err;
 	}
-	//使能msi，然后才能得到pdev->irq
+	//使能msi，然后才能得到pdev->irq          
+	//msi是中断的一种，CPU分配给pci设备一个可使用的寄存器，往这个寄存器写东西就可触发中断
 	 result = pci_enable_msi(pdev);
 	 if (unlikely(result)){
 		DEBUG_ERR("failed:pci_enable_msi\n");

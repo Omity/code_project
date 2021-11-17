@@ -1,4 +1,4 @@
-/* 该函数取自网上分享的PCIe代码,仅供学习 */
+/* 该函数取自网上分享的PCI代码,仅供学习 */
 
 /* 流程:(来自kernel.org官网)
  * Enable the device
@@ -21,8 +21,13 @@
 
 /* 一些API简介
  * 访问PCI配置空间
- * pci_read_config_byte/word/dword(struct pci_dev *pdev, int offset, int *value);
- * pci_write_config_byte/word/dword(struct pci_dev *pdev, int offset, int *value);
+ * int pci_read_config_byte(const struct pci_dev *dev, int where, u8 *val);
+ * int pci_read_config_word(const struct pci_dev *dev, int where, u16 *val);
+ * int pci_read_config_dword(const struct pci_dev *dev, int where, u32 *val);
+ * int pci_write_config_byte(const struct pci_dev *dev, int where, u8 val);
+ * int pci_write_config_word(const struct pci_dev *dev, int where, u16 val);
+ * int pci_write_config_dword(const struct pci_dev *dev, int where, u32 val);
+ * where是偏移量
  * 
  * 返回六个PCI I/O区域之一的第一个地址
  * pci_resource_start(struct pci_dev *dev,  int bar); Bar值的范围为0-5,若是PCI桥,则是0-1
@@ -48,6 +53,7 @@
 #include <linux/device.h>
 #include <linux/pci.h>
 #include <linux/interrupt.h> 
+#include <linux/dma-mapping.h>
 #include <asm/uaccess.h> 
  
 MODULE_LICENSE("Dual BSD/GPL");
@@ -102,6 +108,7 @@ dma_addr_t dma_dst_vir;
 #define HELLO_DEVICE_ID 0x999
 
 /* 指明该驱动适用于哪一些PCI设备 */
+/* 也可以调PCI_DEVICE(vendor, dev) */
 static struct pci_device_id hello_ids[] = {
     {HELLO_VENDOR_ID,HELLO_DEVICE_ID,PCI_ANY_ID,PCI_ANY_ID,0,0,0},
     {0,}
@@ -231,23 +238,32 @@ static int hello_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 	
 	//申请一块DMA内存，作为源地址，在进行DMA读写的时候会用到。
+	//pci_alloc_consistent外包装pci_alloc_coherent,得保证有内存连续
 	dma_src_vir=(dma_addr_t)pci_alloc_consistent(pdev,DMA_BUFFER_SIZE,&dma_src_phy);
-	if(dma_src_vir != 0){
-		for(i=0;i<DMA_BUFFER_SIZE/PAGE_SIZE;i++){
+	if(dma_src_vir != 0)
+	{
+		for(i=0;i<DMA_BUFFER_SIZE/PAGE_SIZE;i++)
+		{
 			SetPageReserved(virt_to_page(dma_src_phy+i*PAGE_SIZE));
 		}
-	} else {
+	} 
+	else 
+	{
 		goto free_bar0;
 	}
 	
 	//申请一块DMA内存，作为目的地址，在进行DMA读写的时候会用到。
 	//pci_alloc_consistent最大一次申请4MB
 	dma_dst_vir=(dma_addr_t)pci_alloc_consistent(pdev,DMA_BUFFER_SIZE,&dma_dst_phy);
-	if(dma_dst_vir!=0){
-		for(i=0;i<DMA_BUFFER_SIZE/PAGE_SIZE;i++){
+	if(dma_dst_vir!=0)
+	{
+		for(i=0;i<DMA_BUFFER_SIZE/PAGE_SIZE;i++)
+		{
 			SetPageReserved(virt_to_page(dma_dst_phy+i*PAGE_SIZE));
 		}
-	} else {
+	} 
+	else 
+	{
 		goto alloc_dma_src_err;
 	}
 	//使能msi，然后才能得到pdev->irq          
@@ -281,11 +297,12 @@ alloc_dma_src_err:
 	pci_free_consistent(pdev,DMA_BUFFER_SIZE,(void *)dma_src_vir,dma_src_phy);
 free_bar0:
 	iounmap((void *)bar0_vir);
-request_regions_err:
-	pci_release_regions(pdev);
-	
+
 enable_device_err:
 	pci_disable_device(pdev);
+	
+request_regions_err:
+	pci_release_regions(pdev);    //根据kernel.org描述，这个API在pci_disable_device之后调用
 end:
 	return result;
 }
@@ -308,8 +325,9 @@ static void hello_remove(struct pci_dev *pdev)
 	pci_free_consistent(pdev,DMA_BUFFER_SIZE,(void *)dma_src_vir,dma_src_phy);
  
 	iounmap((void *)bar0_vir);
-	pci_release_regions(pdev);
 	pci_disable_device(pdev);
+	pci_release_regions(pdev);
+	
 }
  
 //难点三：中断响应设置

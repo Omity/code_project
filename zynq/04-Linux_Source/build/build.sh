@@ -227,11 +227,7 @@ EOF
 				umount part0 part1
 			fi
 			# 复制镜像
-<<<<<<< HEAD
 			get_sd $(pwd)
-=======
-			get_sd "$pwd" "$file_unzip"
->>>>>>> 27a4c2144d7b39c8c22fef031897a6729f2ab6ed
 		fi
 		rm -f -R ../sdimage
 		echo "#################################################"
@@ -244,15 +240,9 @@ EOF
 function main()
 {
 	root_file
-<<<<<<< HEAD
 	#build_boot
 	#build_kernel
 	#build_fs
-=======
-	build_boot
-	build_kernel
-	build_fs
->>>>>>> 27a4c2144d7b39c8c22fef031897a6729f2ab6ed
 	build_sd
 }
 

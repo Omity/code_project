@@ -1,1 +1,0 @@
-/* No platform specific gpio code */

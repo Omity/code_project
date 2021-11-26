@@ -12,6 +12,7 @@
 #include <linux/delay.h>
 #include <asm/cacheflush.h>
 #include <linux/time.h>
+#include <linux/ctype.h>
 
 #define CONFIG_PROCESS_DURATION 10
 
@@ -249,12 +250,12 @@ static int draw_string(unsigned int *framebuffer, char *string)
 		}
 		else if(isupper(string[i]))
 		{
-			u32CharPos = (string[i] - 'a') * 16;
+			u32CharPos = (string[i] - 'A') * 16;
 			draw_char(pTempBuf, u32CharPos);
 		}
 		else
 		{
-			u32CharPos = (string[i] - 'a' - 6) * 16;
+			u32CharPos = (string[i] - 'A' - 6) * 16;
 			draw_char(pTempBuf, u32CharPos);			
 		}
 		pTempBuf += 10;
@@ -296,7 +297,7 @@ static void process_worker(struct work_struct *work)  //定时画进度条
         delay = CONFIG_PROCESS_DURATION * HZ / (u32BlocklenAjust); // 延迟时间 HZ 原值为100
         //draw_char(pu32FbBase + PROGRESS_START_POS, 'c' - 'a');
         //draw_chinese(pu32FbBase + PROGRESS_START_POS);
-		draw_string(pu32FbBase + PROGRESS_START_POS, "upgrade the system...");
+		draw_string(pu32FbBase + PROGRESS_START_POS, "Upgrade the system...");
         //防止uboot阶段没有绘制进度条. 会导致颜色不一样 故取消。
         for (i = 0; i < PROGRESS_WIDTH; i++) 
         {

@@ -75,7 +75,6 @@ static int draw_hollowrectangle(screen_info *screen_stu, int x1, int y1, int x2,
 		base2 += line_offset;
 	}
 
-	//flush_cache((uint)cache_start, p_screen_stu->screen_width * p_screen_stu->screen_height * 4);
 	flush_cache_all();
 
 	return 0;
@@ -186,10 +185,6 @@ static int progressbar_config(processbar_t *progressbar_stu, int frame_color, in
 {
 	processbar_t *progress = progressbar_stu;
 
-	//if(!p)
-	//{
-		//return -1;
-	//}
 	progress->frame_color 	 = frame_color;
 	progress->progress_color = progress_color;
 	progress->progress_ratio = 0;
@@ -257,6 +252,7 @@ static int progressbar_upgrate(screen_info *screen_stu, processbar_t *progressba
 	else
 		pixel = (rate * (progress->height - progress->thick*2)/100);
 	if(rate == progress->progress_ratio)
+
 	{
 		return 0;
 	}
@@ -306,6 +302,7 @@ static int progressbar_upgrate(screen_info *screen_stu, processbar_t *progressba
 
 	return 0;
 }
+
 
 //填充结构体
 static int screen_set(screen_info *screen_info_stu, char *framebuffer)
@@ -376,6 +373,7 @@ static void progressbar_run(struct work_struct *work)
 	
 }
 
+
 static int progressbar_init(void)
 {
 	mywork = create_singlethread_workqueue("my work");
@@ -433,9 +431,14 @@ static int draw_string(unsigned int *framebuffer, char *string)
 		else if(' ' == string[i])
 		{
 		}
-		else 
+		else if(isupper(string[i]))
 		{
 			u32CharPos = CHAR_POS(string[i]) * CHAR_WIDTH;
+			draw_char(pTempBuf, u32CharPos);
+		}
+		else
+		{
+			u32CharPos = (CHAR_POS(string[i]) - 6) * CHAR_WIDTH;
 			draw_char(pTempBuf, u32CharPos);
 		}
 		pTempBuf += 10;

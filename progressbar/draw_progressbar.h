@@ -1,10 +1,6 @@
 #ifndef _DRAW_PROCESSBAR_H
 #define _DRAW_PROCESSBAR_H
 
-//#include <common.h>
-//#include <malloc.h>
-//#include <sunxi_display2.h>
-//#include <sunxi_board.h>
 
 #include <linux/delay.h>
 #include <linux/init.h>

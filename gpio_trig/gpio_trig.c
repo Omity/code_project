@@ -90,9 +90,6 @@
 #define TRIG_GPIO_SET_TRIG_HIGH 6
 #define GPIO_IN_READ_STATE      7
 
-
-static int trigOut_gpios[] = {42, 52, 53, 259,258}; //PB10, PB20, PB21, PI2, PI3 
-static int trigIn_gpios[] = {273, 272, 230, 231}; //PI17, PI16, PH6, PH7
 #define GPIO_OUT_NUM ARRAY_SIZE(trigOut_gpios)
 #define GPIO_IN_NUM ARRAY_SIZE(trigIn_gpios)
 
@@ -101,14 +98,15 @@ static int trigIn_gpios[] = {273, 272, 230, 231}; //PI17, PI16, PH6, PH7
 #define	TRIG_GPIO_IN_D1        1
 #define	TRIG_GPIO_IN_D2        2
 #define	TRIG_GPIO_IN_D3        3
-#define TRIG_GPIO_IN_1         273
-#define TRIG_GPIO_IN_2         272
-#define TRIG_GPIO_IN_3         230
-#define TRIG_GPIO_IN_4         231
-#define TRIG_GPIO_OUT_1        42
-#define TRIG_GPIO_OUT_2        52
-#define TRIG_GPIO_OUT_3        53
-#define TRIG_GPIO_OUT_4        258
+#define TRIG_GPIO_IN_1         273     //PI17
+#define TRIG_GPIO_IN_2         272     //PI16
+#define TRIG_GPIO_IN_3         230     //PH6
+#define TRIG_GPIO_IN_4         231     //PH7
+#define TRIG_GPIO_OUT_1        42      //PB10
+#define TRIG_GPIO_OUT_2        52      //PB20
+#define TRIG_GPIO_OUT_3        53      //PB21
+#define TRIG_GPIO_OUT_4        259     //PI3
+#define TRIG_GPIO_OUT_FAN      258     //PI2
 #define	TRIG_GPIO_IN_D0_NAME   "gpio_trig_in1"
 #define	TRIG_GPIO_IN_D1_NAME   "gpio_trig_in2"
 #define	TRIG_GPIO_IN_D2_NAME   "gpio_trig_in3"
@@ -117,6 +115,22 @@ static int trigIn_gpios[] = {273, 272, 230, 231}; //PI17, PI16, PH6, PH7
 #define TRIG_STATE_FALSE       0
 #define TRIG_GPIO_IN_NUM       4
 #define TRIG_GPIO_LOW          0
+#define TRIG_GPIO_HIGH         1
+
+static int trigOut_gpios[] = {
+	TRIG_GPIO_OUT_1, 
+	TRIG_GPIO_OUT_2,
+	TRIG_GPIO_OUT_3,
+	TRIG_GPIO_OUT_4,
+	TRIG_GPIO_OUT_FAN
+};
+ 
+static int trigIn_gpios[] = {
+	TRIG_GPIO_IN_1,
+	TRIG_GPIO_IN_2,
+	TRIG_GPIO_IN_3,
+	TRIG_GPIO_IN_4
+};
 
 #define DEVICE_NAME "gpio_trig"
 
@@ -524,8 +538,10 @@ static int trig_gpio_configure(struct gpioData *pdata)
         printk("[GPIO]d0_gpio_out gpio request failed");
         goto err_gpio_req;
       }
-
-      ret = TRIG_GPIO_OUTPUT(pdata->gpio_out[i], TRIG_GPIO_LOW);
+	  if(TRIG_GPIO_OUT_FAN == i)   //风扇，1为低速
+		ret = TRIG_GPIO_OUTPUT(pdata->gpio_out[i], TRIG_GPIO_HIGH);
+	  else                         //默认驱动加载时，为输入模式
+	    ret = TRIG_GPIO_OUTPUT(pdata->gpio_out[i], TRIG_GPIO_LOW);
       if (ret)
       {
         printk("[GPIO]set_direction for d0_gpio_out gpio failed");

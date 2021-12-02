@@ -25,7 +25,7 @@
 #define TRIG_OUT_2                   1
 #define TRIG_OUT_3                   2
 #define TRIG_OUT_4                   3
-
+#define TRIG_OUT_FAN                 4
 
 static int gpioTrigPin[] = {
 	TRIG_IN_1,
@@ -35,7 +35,8 @@ static int gpioTrigPin[] = {
 	TRIG_OUT_1,
 	TRIG_OUT_2,
 	TRIG_OUT_3,
-	TRIG_OUT_4
+	TRIG_OUT_4,
+	TRIG_OUT_FAN
 };
 
 static int gpioTrigIOctl[] = {

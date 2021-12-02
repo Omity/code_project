@@ -90,14 +90,13 @@
 #define TRIG_GPIO_SET_TRIG_HIGH 6
 #define GPIO_IN_READ_STATE      7
 
-#define GPIO_OUT_NUM ARRAY_SIZE(trigOut_gpios)
-#define GPIO_IN_NUM ARRAY_SIZE(trigIn_gpios)
 
 // trigIn 相关宏定义
 #define	TRIG_GPIO_IN_D0        0
 #define	TRIG_GPIO_IN_D1        1
 #define	TRIG_GPIO_IN_D2        2
 #define	TRIG_GPIO_IN_D3        3
+#define TRIG_GPIO_OUT_FAN_PIN  4 
 #define TRIG_GPIO_IN_1         273     //PI17
 #define TRIG_GPIO_IN_2         272     //PI16
 #define TRIG_GPIO_IN_3         230     //PH6
@@ -131,6 +130,9 @@ static int trigIn_gpios[] = {
 	TRIG_GPIO_IN_3,
 	TRIG_GPIO_IN_4
 };
+
+#define GPIO_OUT_NUM ARRAY_SIZE(trigOut_gpios)
+#define GPIO_IN_NUM ARRAY_SIZE(trigIn_gpios)
 
 #define DEVICE_NAME "gpio_trig"
 
@@ -538,7 +540,7 @@ static int trig_gpio_configure(struct gpioData *pdata)
         printk("[GPIO]d0_gpio_out gpio request failed");
         goto err_gpio_req;
       }
-	  if(TRIG_GPIO_OUT_FAN == i)   //风扇，1为低速
+	  if(TRIG_GPIO_OUT_FAN_PIN == i)   //风扇，1为低速
 		ret = TRIG_GPIO_OUTPUT(pdata->gpio_out[i], TRIG_GPIO_HIGH);
 	  else                         //默认驱动加载时，为输入模式
 	    ret = TRIG_GPIO_OUTPUT(pdata->gpio_out[i], TRIG_GPIO_LOW);

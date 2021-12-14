@@ -7,33 +7,38 @@
 版本：V0.1
 创建时间：2021/12/9 20:49
 
-修改历史： 修改历史1
-修改时间： 2021年12月11日
-版本号：   V0.2
-修改人：   舒杰
-修改内容： 修改linux路径，取消自动获取，采用直接给出的绝对路径
+修改历史：
+修改时间：
+版本号：
+修改人：
+修改内容：
 
 备注： 本程序需要linux端满足可以上网, Windows端能ping通linux，且linux端安装了openssh-server和openssh-client
       python版本使用python3.9
+
+      pscp下载:https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
 """
 # 库引入
-import datetime
 import os
 import os.path
 import re
+import socket
 import paramiko
+import datetime
 from tqdm import tqdm
 # 变量声明
-USE_DEBUG = 1
+USE_DEBUG = 0
 USE_LINUX_FIND = 0                                      # 使用find命令获取工程的linux绝对路径
-SOURCE_FILE_NAME = "test"                            # 工程目录
-LINUX_IP = "192.168.171.128"                            # 虚拟机ip
-LINUX_LOGIN_USER = "shujie"                                 # 当前登录用户名
+SOURCE_FILE_NAME = "sousa_os"                            # 工程目录
+LINUX_IP = "192.168.136.137"                            # 虚拟机ip
+LINUX_LOGIN_USER = "GJ"                                 # 当前登录用户名
 LINUX_LOGIN_CODE = "0"                                  # 登录密码
-LINUX_FIND_SOURCE_CMD = " ".join(['find ~ -type d -name', SOURCE_FILE_NAME])      # 默认文件建立在home目录下, 如果不是需调整
-LINUX_SOURCE_PATH = "/".join(['/home', LINUX_LOGIN_USER, SOURCE_FILE_NAME])       # 默认在home目录下
-WINDOWS_LOCAL_PATH = 'C:\\Work_Rigol\\test'
-LOG_FILE = 'copyLog.txt'
+LINUX_FIND_SOURCE_CMD = 'find ~ -type d -name ' + SOURCE_FILE_NAME      # 默认文件建立在home目录下, 如果不是需调整
+LINUX_SOURCE_PATH = '/home/GJ/Desktop/' + SOURCE_FILE_NAME + '/out'
+WINDOWS_LOCAL_PATH = 'E:\\sousa_os'
+LOG_FILE = 'copy_log.txt'
+TEST_LOG = 'source_list.txt'
+PSCP_PATH = 'E:\\tools\\pscp.exe'
 
 # 函数实现
 
@@ -48,10 +53,11 @@ def er_info(string):
     print(f'\033[0;31m{string}\033[0m')
 
 def make_log(txt, string):
-    get_time = " ".join(["[", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), "]"])
     with open(txt, 'a') as f:
+        get_time = "[" + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]"
         f.write(" ".join([get_time, string, '\n']))
 
+# 类实现
 class GetSourceFromLinux:
 
     def __init__(self):
@@ -59,19 +65,25 @@ class GetSourceFromLinux:
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.local_path = WINDOWS_LOCAL_PATH
-        # 连接SSH服务端
-        self.client.connect(LINUX_IP, username=LINUX_LOGIN_USER, password=LINUX_LOGIN_CODE)
 
+    # 连接SSH服务端
     def connect(self):
         try:
-            # 连接SSH服务端
             self.client.connect(LINUX_IP, username=LINUX_LOGIN_USER, password=LINUX_LOGIN_CODE)
-            pr_info('尝试连接linux...')
-        except paramiko.SSHException:
-            er_info('failed in SSH2 protocol negotiation or logic errors')
+            pr_info('尝试建立SSH连接....')
+        except paramiko.ssh_exception.AuthenticationException:
+            er_info('authentication failed')
             self.client.close()
             return
-        pr_info('连接成功!')
+        except paramiko.SSHException:
+            er_info('there was any other error connecting or establishing an SSH session')
+            self.client.close()
+            return
+        except socket.error:
+            er_info('A socket error occurred while connecting')
+            self.client.close()
+            return
+        pr_info('连接linux成功!')
 
     def send_linux_cmd(self, cmd):
 
@@ -128,8 +140,13 @@ class GetSourceFromLinux:
             except IOError:
                 make_log(LOG_FILE, f'copy file {source[i]} failed')
                 er_info(f'copy file {source[i]} failed!')
-                return
-        pr_info('复制文件成功!')
+        # pr_info('复制文件成功!')
+
+    @staticmethod
+    def pscp_copy_file(source, locate):
+        # for i in tqdm(range(len(source))):
+        cmd = PSCP_PATH + f' -r -pw {LINUX_LOGIN_CODE} {LINUX_LOGIN_USER}@{LINUX_IP}:{source} {locate}'
+        os.system(cmd)
 
     def get_source_code_from_linux(self):
         """
@@ -166,12 +183,78 @@ class GetSourceFromLinux:
             de_info(i)
         # 创建空文件目录
         self.mk_dir(return_dir_list)
-        # 复制文件夹
-        self.copy_file(return_file_list, windows_path_list)
-
         self.client.close()
+        # 复制文件夹
+        self.pscp_copy_file(return_file_list, windows_path_list)
+        # self.copy_file(return_file_list, windows_path_list)
+
+class Pscp(object):
+
+    """
+    pscp.exe
+    用法: pscp [选项] [用户名@]主机:源 目标
+      pscp [选项] 源 [其他源...] [用户名@]主机:目标
+      pscp [选项] -ls [用户名@]主机:指定文件
+        选项:
+          -V        显示版本信息后退出
+          -pgpfp    显示 PGP 密钥指纹后退出
+          -p        保留文件属性
+          -q        安静模式，不显示状态信息
+          -r        递归拷贝目录
+          -v        显示详细信息
+          -load 会话名  载入保存的会话信息
+          -P 端口   连接指定的端口
+          -l 用户名 使用指定的用户名连接
+          -pw 密码  使用指定的密码登录
+          -1 -2     强制使用 SSH 协议版本
+          -4 -6     强制使用 IPv4 或 IPv6 版本
+          -C        允许压缩
+          -i 密钥   认证使用的密钥文件
+          -noagent  禁用 Pageant 认证代理
+          -agent    启用 Pageant 认证代理
+          -hostkey aa:bb:cc:...
+                    手动指定主机密钥(可能重复)
+          -batch    禁止所有交互提示
+          -proxycmd 命令
+                    使用 '命令' 作为本地代理
+          -unsafe   允许服务端通配符(危险操作)
+          -sftp     强制使用 SFTP 协议
+          -scp      强制使用 SCP 协议
+          -sshlog 文件
+          -sshrawlog 文件 记录协议详细日志到指定文件
+    """
+
+    def __init__(self, path):
+        self.pscp_path = path
+
+    def windowToLinuxFile(self, window_path, Linux_path, Linux_ip, username, password):
+        cmd = self.pscp_path + f'-pw {password} {window_path} {username}@{Linux_ip}:{Linux_path}'
+        os.system(cmd)
+
+    def windowToLinuxDir(self, window_path, Linux_path, Linux_ip, username, password):
+        cmd = self.pscp_path + f'-pw {password} -r {window_path} {username}@{Linux_ip}:{Linux_path}'
+        os.system(cmd)
+
+    def linuxToWindowFile(self, Linux_path, window_path, Linux_ip, username, password):
+        cmd = self.pscp_path + f' -pw {password} {username}@{Linux_ip}:{Linux_path} {window_path}'
+        os.system(cmd)
+
+    def linuxToWindowDir(self, Linux_path, window_path, Linux_ip, username, password):
+        cmd = self.pscp_path + f' -r -pw {password} {username}@{Linux_ip}:{Linux_path} {window_path}'
+        os.system(cmd)
+
+class CopyFile(object):
+
+    def __init__(self, path, linux_user, linux_pd, linux_ip):
+        self.user = linux_user
+        self.passwd = linux_pd
+        self.ip = linux_ip
+        self.pscp = Pscp(path)
+
+    def copyFile(self, source, locate):
+        de_info(f'In this part, start to copy files from linux: {self.ip}')
+        self.pscp.linuxToWindowDir(source, locate, self.ip, self.user, self.passwd)
 
 
-client = GetSourceFromLinux()
-client.connect()
-client.get_source_code_from_linux()
+cp = CopyFile(PSCP_PATH, LINUX_LOGIN_USER, LINUX_LOGIN_CODE, LINUX_IP)
+cp.copyFile(LINUX_SOURCE_PATH, WINDOWS_LOCAL_PATH)

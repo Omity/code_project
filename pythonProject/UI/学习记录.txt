@@ -1,0 +1,21 @@
+# noinspection PyBroadException
+	用于消除不确定异常报错时的warning,如Except和except Exception as e
+	
+#<Button-1>单击鼠标左键
+#<Button-2>鼠标中键
+#<Button-3>鼠标右键
+#<Double-Button-1>单击鼠标左键双击
+#<Double-Button-2>鼠标中键双击
+#<Double-Button-3>鼠标右键双击
+#<Triple-Button-1>鼠标左键三击
+
+
+
+Combobox 组合框
+	current()-----> 设置默认选项
+
+
+Text   文本
+	tag_config()  打标签,用于多个text时
+	delete()      删除text区内容
+	

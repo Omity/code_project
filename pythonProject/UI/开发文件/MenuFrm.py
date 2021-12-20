@@ -33,40 +33,6 @@ class MenuFrame(object):
         self.root = master
         self.createFrame()
 
-        """
-        参数初始化
-        """
-        self.frm = tk.Frame()
-        self.frm_status_top_left = tk.Frame()
-        self.frm_status_top_right = tk.Frame()
-
-        self.frm_status = tk.LabelFrame()
-        self.frm_status_top = tk.LabelFrame()
-        self.frm_status_bottom = tk.LabelFrame()
-        self.frm_function = tk.LabelFrame()
-        self.frm_function_top = tk.LabelFrame()
-        self.frm_func_top_copy = tk.LabelFrame()
-        self.frm_func_top_check = tk.LabelFrame()
-        self.frm_func_top_sdk = tk.LabelFrame()
-        self.frm_function_bot = tk.LabelFrame()
-
-        self.title_label = tk.Label()
-        self.windows_path_label = tk.Label()
-        self.linux_path_label = tk.Label()
-        self.connect_status_label = tk.Label()
-        self.connect_status = tk.Label()
-
-        self.ip_entry = tk.Entry()
-        self.user_entry = tk.Entry()
-        self.pd_entry = tk.Entry()
-        self.windows_path_entry = tk.Entry()
-        self.linux_path_entry = tk.Entry()
-
-        self.windows_path_var = tk.StringVar()
-
-        self.choose_path_btn = tk.Button()
-        self.copy_btn = tk.Button()
-
     def createFrame(self):
         """
         创建窗体,分为左右两部分,左边为状态栏,右边为功能区
@@ -181,18 +147,29 @@ class MenuFrame(object):
         :return:
         """
         label_font = ('Monaco', 10)
-        self.connect_status_label = tk.Label(self.frm_func_top_copy, text='status:', font=G_FONT)
-        self.connect_status = tk.Label(self.frm_func_top_copy, text='disconnected', fg='red', font=label_font)
+        self.connect_status = tk.Radiobutton(self.frm_func_top_copy, text='未连接', fg='red', font=label_font)
         self.copy_btn = tk.Button(self.frm_func_top_copy, text='copy',
                                   width=8, bg='lightblue', font=G_FONT,
                                   command=self.copyClick)
 
-        self.connect_status_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.connect_status.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.copy_btn.pack(fill='both', expand=0, padx=5, pady=5, side=tk.RIGHT)
 
     def createCheckFuncFrame(self):
-        pass
+        """
+        创建check功能区
+        :return:
+        """
+        self.check_menu = tk.Menu(self.frm_func_top_check, tearoff=False)
+        self.check_menu.add_command(label='test')
+        self.copyright_label = tk.Label(self.frm_func_top_check, text='copyright', font=G_FONT)
+        self.licenses_label = tk.Label(self.frm_func_top_check, text='licenses', font=G_FONT)
+
+        self.copyright_label.bind('<Enter>', self.on_copyright_enter)
+        self.copyright_label.bind('<Leave>', self.on_copyright_leave)
+
+        self.copyright_label.pack(fill='both', expand=0, side=tk.LEFT)
+        self.licenses_label.pack(fill='both', expand=0, side=tk.LEFT)
 
     def createSDKFuncFrame(self):
         pass
@@ -208,6 +185,23 @@ class MenuFrame(object):
         self.windows_path_var.set(fd.askdirectory())
 
     def copyClick(self):
+        """
+        copy按键点击
+        :return:
+        """
+        # if self.copy_btn['text'] == 'copy':
+        #     self.copy_btn['text'] = 'exit'
+        #     self.connect_status['text'] = '已连接'
+        #     self.connect_status['fg'] = 'green'
+        # else:
+        #     self.copy_btn['text'] = 'copy'
+        #     self.connect_status['text'] = '未连接'
+        #     self.connect_status['fg'] = 'red'
+
+    def on_copyright_enter(self, event):
+        self.check_menu.post(event.x_root, event.y_root)
+
+    def on_copyright_leave(self, event):
         pass
 
 

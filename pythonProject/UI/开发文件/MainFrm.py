@@ -15,7 +15,10 @@
 """
 
 # 导入的包
-
+import tkinter as tk
+import tkinter.ttk as ttk
+import tkinter.font as font
+from MenuFrm import MenuFrame
 # 宏定义
 
 # 版本号
@@ -23,3 +26,45 @@
 # 函数实现
 
 # 类实现
+
+class MainFrame(object):
+    """
+    主UI
+    """
+    def __init__(self, master=None):
+        self.root = master
+        self.createFrame()
+
+    def createFrame(self):
+        self.frm_main = tk.LabelFrame(self.root)
+        self.frm_main.pack(fill='both', expand=1)
+
+        self.createFrmMain()
+
+    def createFrmMain(self):
+        self.frm_menu = MenuFrame(self.frm_main)
+        self.frm_menu.frm.pack(fill='both', expand=1)
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
+    root.geometry()
+
+    monacofont = font.Font(family="Monaco", size=16)
+    root.option_add("*TCombobox*Listbox*background", "#292929")
+    root.option_add("*TCombobox*Listbox*foreground", "#FFFFFF")
+    root.option_add("*TCombobox*Listbox*font", monacofont)
+
+    root.configure(bg="#292929")
+    combostyle = ttk.Style()
+    combostyle.theme_use('default')
+    combostyle.configure("TCombobox",
+                         selectbackground="#292929",
+                         fieldbackground="#292929",
+                         background="#292929",
+                         foreground="#FFFFFF")
+
+    app = MainFrame(root)
+    root.mainloop()

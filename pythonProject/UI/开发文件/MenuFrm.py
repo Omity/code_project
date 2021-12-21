@@ -15,6 +15,7 @@
 """
 
 # 导入的包
+import sys
 import tkinter as tk
 import tkinter.font as font
 import tkinter.ttk as ttk
@@ -31,6 +32,7 @@ class MenuFrame(object):
 
     def __init__(self, master=None):
         self.root = master
+        sys.stdout = self
         self.createFrame()
 
     def createFrame(self):
@@ -185,15 +187,14 @@ class MenuFrame(object):
         self.sdk_btn.pack(fill='both', expand=0, side=tk.RIGHT)
 
     def createFuncBotFrame(self):
-                """
+        """
         创建输出打印窗口
         """
-        self.info_var = tk.StringVar()
         self.out_label = tk.Label(self.frm_function_bot, text='输\n\n\n\n出', font=G_FONT)
-        self.out_entry = tk.Entry(self.frm_function_bot, textvariable=self.info_var, font=G_FONT)
+        self.out_text = tk.Text(self.frm_function_bot)
 
         self.out_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
-        self.out_entry.pack(fill='both', expand=1, padx=5, pady=5, side=tk.RIGHT)
+        self.out_text.pack(fill='both', expand=1, padx=5, pady=5, side=tk.RIGHT)
 
     def openDir(self):
         """
@@ -217,10 +218,26 @@ class MenuFrame(object):
         #     self.connect_status['fg'] = 'red'
 
     def checkClick(self):
-        pass
+        """
+        check按键功能
+        :return:
+        """
+        # self.out_text.insert('insert', sys.stdout)
+        print('i test')
 
     def sdkClick(self):
-        pass
+        """
+        sdk按键功能区
+        :return:
+        """
+        print('this is a test')
+
+    def write(self, buf):
+        self.out_text.insert('insert', buf)
+        self.out_text.see('end')
+
+    def flush(self):
+        self.out_text.delete("0.0", "end")
 
 
 if __name__ == '__main__':
@@ -248,3 +265,4 @@ if __name__ == '__main__':
     app = MenuFrame(root)
     # app.frm.pack(fill='both', expand=1)
     root.mainloop()
+

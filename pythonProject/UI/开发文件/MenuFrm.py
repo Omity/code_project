@@ -160,22 +160,40 @@ class MenuFrame(object):
         创建check功能区
         :return:
         """
-        self.check_menu = tk.Menu(self.frm_func_top_check, tearoff=False)
-        self.check_menu.add_command(label='test')
         self.copyright_label = tk.Label(self.frm_func_top_check, text='copyright', font=G_FONT)
         self.licenses_label = tk.Label(self.frm_func_top_check, text='licenses', font=G_FONT)
-
-        self.copyright_label.bind('<Enter>', self.on_copyright_enter)
-        self.copyright_label.bind('<Leave>', self.on_copyright_leave)
+        self.check_btn = tk.Button(self.frm_func_top_check, text='check',
+                                   width=6, bg='lightblue', font=G_FONT,
+                                   activebackground='green', command=self.checkClick)
 
         self.copyright_label.pack(fill='both', expand=0, side=tk.LEFT)
         self.licenses_label.pack(fill='both', expand=0, side=tk.LEFT)
+        self.check_btn.pack(fill='both', expand=0, side=tk.RIGHT)
 
     def createSDKFuncFrame(self):
-        pass
+        """
+        创建sdk功能区
+        """
+        self.file_path_label = tk.Label(self.frm_func_top_sdk, text='file:', font=G_FONT)
+        self.file_path_entry = tk.Entry(self.frm_func_top_sdk, width=10)
+        self.sdk_btn = tk.Button(self.frm_func_top_sdk, text='sdk',
+                                 width=6, bg='lightblue', font=G_FONT,
+                                 activebackground='green', command=self.sdkClick)
+
+        self.file_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.file_path_entry.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.sdk_btn.pack(fill='both', expand=0, side=tk.RIGHT)
 
     def createFuncBotFrame(self):
-        pass
+                """
+        创建输出打印窗口
+        """
+        self.info_var = tk.StringVar()
+        self.out_label = tk.Label(self.frm_function_bot, text='输\n\n\n\n出', font=G_FONT)
+        self.out_entry = tk.Entry(self.frm_function_bot, textvariable=self.info_var, font=G_FONT)
+
+        self.out_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.out_entry.pack(fill='both', expand=1, padx=5, pady=5, side=tk.RIGHT)
 
     def openDir(self):
         """
@@ -198,10 +216,10 @@ class MenuFrame(object):
         #     self.connect_status['text'] = '未连接'
         #     self.connect_status['fg'] = 'red'
 
-    def on_copyright_enter(self, event):
-        self.check_menu.post(event.x_root, event.y_root)
+    def checkClick(self):
+        pass
 
-    def on_copyright_leave(self, event):
+    def sdkClick(self):
         pass
 
 

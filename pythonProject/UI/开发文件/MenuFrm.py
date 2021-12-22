@@ -16,6 +16,7 @@
 
 # 导入的包
 import sys
+import datetime
 import tkinter as tk
 import tkinter.font as font
 import tkinter.ttk as ttk
@@ -42,15 +43,22 @@ class MenuFrame(object):
         """
         self.frm = tk.Frame(self.root)
 
-        self.frm_status = tk.LabelFrame(self.frm)
-        self.frm_function = tk.LabelFrame(self.frm)
+        self.frm_top = tk.Frame(self.frm)
+        self.frm_bottom = tk.Frame(self.frm)
+        self.frm_status = tk.LabelFrame(self.frm_top)
+        self.frm_function = tk.LabelFrame(self.frm_top)
+        self.frm_version = tk.LabelFrame(self.frm_bottom)
 
         self.frm.pack(fill='both', expand=1)
+        self.frm_top.pack(fill='both', expand=1)
         self.frm_status.pack(fill='both', expand=1, side=tk.LEFT)
         self.frm_function.pack(fill='both', expand=1, side=tk.RIGHT)
+        self.frm_bottom.pack(fill='both', expand=1)
+        self.frm_version.pack(fill='both', expand=0, side=tk.BOTTOM)
 
         self.createStatusFrame()
         self.createFunctionFrame()
+        self.createVerFrame()
 
     def createStatusFrame(self):
         """
@@ -98,18 +106,20 @@ class MenuFrame(object):
         """
         self.windows_path_var = tk.StringVar()
         frm_windows_path_temp = tk.Frame(self.frm_status_bottom)
+        frm_linux_path_temp = tk.Frame(self.frm_status_bottom)
         self.windows_path_label = tk.Label(frm_windows_path_temp, text='Windows Path:', font=G_FONT)
         self.choose_path_btn = tk.Button(frm_windows_path_temp, text='...', command=self.openDir)
         self.windows_path_entry = tk.Entry(self.frm_status_bottom, width=20, textvariable=self.windows_path_var)
-        self.linux_path_label = tk.Label(self.frm_status_bottom, text='Linux Path:', font=G_FONT)
+        self.linux_path_label = tk.Label(frm_linux_path_temp, text='Linux Path:', font=G_FONT)
         self.linux_path_entry = tk.Entry(self.frm_status_bottom, width=20)
 
         frm_windows_path_temp.pack(fill='both', expand=0, padx=5, pady=5)
         self.windows_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.choose_path_btn.pack(fill='x', expand=0, padx=5, pady=5, side=tk.RIGHT)
-        self.windows_path_entry.pack(fill='both', expand=1, padx=5, pady=5)
-        self.linux_path_label.pack(fill='both', expand=0, padx=5, pady=5)
-        self.linux_path_entry.pack(fill='x', expand=1, padx=5, pady=5)
+        self.windows_path_entry.pack(fill='both', expand=0, padx=5, pady=5)
+        frm_linux_path_temp.pack(fill='both', expand=0, padx=5, pady=5)
+        self.linux_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.linux_path_entry.pack(fill='both', expand=0, padx=5, pady=5)
 
     def createFunctionFrame(self):
         """
@@ -196,6 +206,14 @@ class MenuFrame(object):
         self.out_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.out_text.pack(fill='both', expand=1, padx=5, pady=5, side=tk.RIGHT)
 
+    def createVerFrame(self):
+        self.version_label = tk.Label(self.frm_version, text='version: V1.0.0', font=G_FONT)
+        self.time_label = tk.Label(self.frm_version, text=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                   font=G_FONT)
+
+        self.version_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.time_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.RIGHT)
+
     def openDir(self):
         """
         打开Windows文件路径
@@ -230,14 +248,39 @@ class MenuFrame(object):
         sdk按键功能区
         :return:
         """
-        print('this is a test')
+        print('this is a test failed and failure')
 
     def write(self, buf):
+        """
+        重写write函数
+        :param buf:
+        :return:
+        """
+        self.setSpecificWord()
         self.out_text.insert('insert', buf)
         self.out_text.see('end')
 
     def flush(self):
         self.out_text.delete("0.0", "end")
+
+    def setSpecificWord(self):
+        """
+        设置一些特殊字体
+        :return: 无
+        """
+        fail_list = ['failed', 'fail', 'failure']
+        self.out_text.tag_remove('found', '1.0', tk.END)
+
+        for word in fail_list:
+            idx = '1.0'
+            while idx:
+                idx = self.out_text.search(word, idx, nocase=1, stopindex=tk.END)
+                if idx:
+                    last_idx = '%s+%dc' % (idx, len(word))
+                    self.out_text.tag_add('found', idx, last_idx)
+                    idx = last_idx
+
+        self.out_text.tag_config('found', foreground='red')
 
 
 if __name__ == '__main__':

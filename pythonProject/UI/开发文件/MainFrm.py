@@ -15,6 +15,8 @@
 """
 
 # 导入的包
+import threading
+import datetime
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.font as font
@@ -40,10 +42,52 @@ class MainFrame(object):
         self.frm_main.pack(fill='both', expand=1)
 
         self.createFrmMain()
+        self.initMenuFrame()
 
     def createFrmMain(self):
         self.frm_menu = MenuFrame(self.frm_main)
         self.frm_menu.frm.pack(fill='both', expand=1)
+
+    def initMenuFrame(self):
+        """
+        初始化窗口的一些参数
+        :return:
+        """
+        self.startThreadTimer(self.updateTime, 1)
+
+    @staticmethod
+    def startThreadTimer(callback, timer=1):
+        """
+        启动一个循环线程
+        :param callback: 回调函数
+        :param timer:    时间差
+        :return:         无
+        """
+        temp_thread = threading.Timer(timer, callback)
+        temp_thread.setDaemon(True)
+        temp_thread.start()
+
+    @staticmethod
+    def startThreadThread(callback, name='thread'):
+        """
+        启动一个线程
+        :param callback: 回调函数
+        :param name:     线程名
+        :return:         无
+        """
+        temp_thread = threading.Thread(target=callback, name=name)
+        temp_thread.setDaemon(True)
+        temp_thread.start()
+
+    # 后期会考虑将该函数移到主函数当中,并且更改写法,现在的写法缺乏移植性
+    def updateTime(self):
+        """
+        更新时间
+        :return: 无
+        """
+        # self.time_var = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.frm_menu.time_label['text'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.startThreadTimer(self.updateTime, 1)
 
 
 if __name__ == '__main__':

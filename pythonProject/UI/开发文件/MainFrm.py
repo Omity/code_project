@@ -19,13 +19,17 @@ import threading
 import datetime
 import tkinter as tk
 import tkinter.ttk as ttk
-import tkinter.font as font
+import tkinter.font as tkf
 from MenuFrm import MenuFrame
+from PIL import Image, ImageTk    # tk自带的仅支持GIF、PGM和PPM
 # 宏定义
 
 # 版本号
-
+VERSION = '.0.01'
 # 函数实现
+def getImage(file):
+    im = Image.open(file)
+    return ImageTk.PhotoImage(im)
 
 # 类实现
 
@@ -33,11 +37,18 @@ class MainFrame(object):
     """
     主UI
     """
+
     def __init__(self, master=None):
         self.root = master
+        self.clear_icon = getImage('../image/clear.jpg')
+        self.version = VERSION
         self.createFrame()
 
     def createFrame(self):
+        """
+        创建主窗口
+        :return:
+        """
         self.frm_main = tk.LabelFrame(self.root)
         self.frm_main.pack(fill='both', expand=1)
 
@@ -45,6 +56,10 @@ class MainFrame(object):
         self.initMenuFrame()
 
     def createFrmMain(self):
+        """
+        创建Menu
+        :return:
+        """
         self.frm_menu = MenuFrame(self.frm_main)
         self.frm_menu.frm.pack(fill='both', expand=1)
 
@@ -53,7 +68,13 @@ class MainFrame(object):
         初始化窗口的一些参数
         :return:
         """
-        self.startThreadTimer(self.updateTime, 1)
+        self.frm_menu.version_label['text'] = self.version
+        self.frm_menu.copy_btn['command'] = self.copyClick
+        self.frm_menu.check_btn['command'] = self.checkClick
+        self.frm_menu.sdk_btn['command'] = self.sdkClick
+        self.frm_menu.out_clear_btn['image'] = self.clear_icon
+        self.frm_menu.out_text.tag_config('green', foreground="#228B22")
+        self.startTime()
 
     @staticmethod
     def startThreadTimer(callback, timer=1):
@@ -79,15 +100,41 @@ class MainFrame(object):
         temp_thread.setDaemon(True)
         temp_thread.start()
 
+    def updateVer(self):
+        self.frm_menu.version_label['text'] = self.version
+
+    def startTime(self):
+        self.updateTime()
+        self.startThreadTimer(self.startTime, 1)
+
     # 后期会考虑将该函数移到主函数当中,并且更改写法,现在的写法缺乏移植性
     def updateTime(self):
         """
         更新时间
         :return: 无
         """
-        # self.time_var = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.frm_menu.time_label['text'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.startThreadTimer(self.updateTime, 1)
+
+    def copyClick(self):
+        """
+        copy按键
+        :return:
+        """
+        pass
+
+    def checkClick(self):
+        """
+        check按键
+        :return:
+        """
+        pass
+
+    def sdkClick(self):
+        """
+        SDK按键
+        :return:
+        """
+        pass
 
 
 if __name__ == '__main__':
@@ -96,19 +143,19 @@ if __name__ == '__main__':
     root.rowconfigure(0, weight=1)
     root.geometry()
 
-    monacofont = font.Font(family="Monaco", size=16)
+    monaco_font = tkf.Font(family="Monaco", size=16)
     root.option_add("*TCombobox*Listbox*background", "#292929")
     root.option_add("*TCombobox*Listbox*foreground", "#FFFFFF")
-    root.option_add("*TCombobox*Listbox*font", monacofont)
+    root.option_add("*TCombobox*Listbox*font", monaco_font)
 
     root.configure(bg="#292929")
-    combostyle = ttk.Style()
-    combostyle.theme_use('default')
-    combostyle.configure("TCombobox",
-                         selectbackground="#292929",
-                         fieldbackground="#292929",
-                         background="#292929",
-                         foreground="#FFFFFF")
+    combo_style = ttk.Style()
+    combo_style.theme_use('default')
+    combo_style.configure("TCombobox",
+                          selectbackground="#292929",
+                          fieldbackground="#292929",
+                          background="#292929",
+                          foreground="#FFFFFF")
 
     app = MainFrame(root)
     root.mainloop()

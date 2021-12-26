@@ -18,14 +18,17 @@
 import sys
 import datetime
 import tkinter as tk
-import tkinter.font as font
+import tkinter.font as tkf
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
+
 # 宏定义
 G_FONT = ('Monaco', 16)
+
 # 版本号
 
 # 函数实现
+
 
 # 类实现
 
@@ -33,7 +36,9 @@ class MenuFrame(object):
 
     def __init__(self, master=None):
         self.root = master
+        # 重定向输出和error
         sys.stdout = self
+        sys.stderr = self
         self.createFrame()
 
     def createFrame(self):
@@ -45,16 +50,9 @@ class MenuFrame(object):
 
         self.frm_top = tk.Frame(self.frm)
         self.frm_bottom = tk.Frame(self.frm)
-        self.frm_status = tk.LabelFrame(self.frm_top)
-        self.frm_function = tk.LabelFrame(self.frm_top)
-        self.frm_version = tk.LabelFrame(self.frm_bottom)
 
-        self.frm.pack(fill='both', expand=1)
         self.frm_top.pack(fill='both', expand=1)
-        self.frm_status.pack(fill='both', expand=1, side=tk.LEFT)
-        self.frm_function.pack(fill='both', expand=1, side=tk.RIGHT)
-        self.frm_bottom.pack(fill='both', expand=1)
-        self.frm_version.pack(fill='both', expand=0, side=tk.BOTTOM)
+        self.frm_bottom.pack(fill='both', expand=0)
 
         self.createStatusFrame()
         self.createFunctionFrame()
@@ -65,13 +63,15 @@ class MenuFrame(object):
         状态栏显示功能区使用的公共变量, 为排版合适，将路径分离出来
         :return: 无
         """
+        self.frm_status = tk.LabelFrame(self.frm_top)
+        self.frm_status.pack(fill='both', expand=1, side=tk.LEFT)
 
         self.title_label = tk.Label(self.frm_status, text='状态栏', font=G_FONT)
         self.frm_status_top = tk.LabelFrame(self.frm_status)
         self.frm_status_bottom = tk.LabelFrame(self.frm_status)
 
         self.title_label.pack(fill='both', expand=0, padx=5, pady=5)
-        self.frm_status_top.pack(fill='both', expand=1)
+        self.frm_status_top.pack(fill='both', expand=0)
         self.frm_status_bottom.pack(fill='both', expand=1)
 
         self.createStatusTopFrame()
@@ -89,7 +89,7 @@ class MenuFrame(object):
         self.frm_status_top_right.pack(fill='both', expand=1, side=tk.RIGHT)
 
         for item in setting_label_list:
-            temp_label = tk.Label(self.frm_status_top, text=item, font=G_FONT)
+            temp_label = tk.Label(self.frm_status_top, text=item, font=G_FONT, anchor='w')
             temp_label.pack(fill='both', expand=1, padx=5, pady=5)
         self.ip_entry = tk.Entry(self.frm_status_top_right, width=20)
         self.user_entry = tk.Entry(self.frm_status_top_right, width=20)
@@ -126,6 +126,8 @@ class MenuFrame(object):
         功能区,主要分为两部分,上半部为功能选项区,下半区为打印区
         :return:
         """
+        self.frm_function = tk.LabelFrame(self.frm_top)
+        self.frm_function.pack(fill='both', expand=1, side=tk.RIGHT)
 
         self.frm_function_top = tk.LabelFrame(self.frm_function)
         self.frm_function_bot = tk.LabelFrame(self.frm_function)
@@ -161,11 +163,11 @@ class MenuFrame(object):
         label_font = ('Monaco', 10)
         self.connect_status = tk.Radiobutton(self.frm_func_top_copy, text='未连接', fg='red', font=label_font)
         self.copy_btn = tk.Button(self.frm_func_top_copy, text='copy',
-                                  width=8, bg='lightblue', font=G_FONT,
+                                  width=6, bg='lightblue', font=G_FONT,
                                   command=self.copyClick)
 
         self.connect_status.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
-        self.copy_btn.pack(fill='both', expand=0, padx=5, pady=5, side=tk.RIGHT)
+        self.copy_btn.pack(fill='both', expand=0, side=tk.RIGHT)
 
     def createCheckFuncFrame(self):
         """
@@ -186,32 +188,53 @@ class MenuFrame(object):
         """
         创建sdk功能区
         """
+        self.file_path_var = tk.StringVar()
         self.file_path_label = tk.Label(self.frm_func_top_sdk, text='file:', font=G_FONT)
-        self.file_path_entry = tk.Entry(self.frm_func_top_sdk, width=10)
+        self.file_path_entry = tk.Entry(self.frm_func_top_sdk, width=20, textvariable=self.file_path_var)
+        self.file_path_btn = tk.Button(self.frm_func_top_sdk, text='...', command=self.openFile)
         self.sdk_btn = tk.Button(self.frm_func_top_sdk, text='sdk',
                                  width=6, bg='lightblue', font=G_FONT,
                                  activebackground='green', command=self.sdkClick)
 
         self.file_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.file_path_entry.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.file_path_btn.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.sdk_btn.pack(fill='both', expand=0, side=tk.RIGHT)
 
     def createFuncBotFrame(self):
         """
         创建输出打印窗口
         """
-        self.out_label = tk.Label(self.frm_function_bot, text='输\n\n\n\n出', font=G_FONT)
-        self.out_text = tk.Text(self.frm_function_bot)
+        self.frm_out_left = tk.Frame(self.frm_function_bot)
+        self.out_clear_btn = tk.Button(self.frm_out_left, command=self.outClear)
+        self.out_label = tk.Label(self.frm_out_left, text='\n\n输\n\n\n\n出', font=G_FONT)
+        self.s_bar = tk.Scrollbar(self.frm_function_bot)
+        self.out_text = tk.Text(self.frm_function_bot, state='disabled', yscrollcommand=self.s_bar.set)
 
-        self.out_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.s_bar.config(command=self.out_text.yview)
+        self.frm_out_left.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.out_clear_btn.pack(fill='both', expand=0, padx=5, pady=5)
+        self.out_label.pack(fill='both', expand=0, padx=5, pady=5)
+        self.s_bar.pack(fill='both', expand=1, padx=5, pady=5, side=tk.RIGHT)
         self.out_text.pack(fill='both', expand=1, padx=5, pady=5, side=tk.RIGHT)
 
     def createVerFrame(self):
-        self.version_label = tk.Label(self.frm_version, text='version: V1.0.0', font=G_FONT)
+        """
+        创建版本信息窗口
+        :return:
+        """
+        self.frm_version = tk.LabelFrame(self.frm_bottom)
+        self.frm_version.pack(fill='both', expand=0, side=tk.BOTTOM)
+
+        self.frm_version_left = tk.Frame(self.frm_version)
+        self.version = tk.Label(self.frm_version_left, text='Version:', font=G_FONT)
+        self.version_label = tk.Label(self.frm_version_left, text='Version:', font=G_FONT)
         self.time_label = tk.Label(self.frm_version, text=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                                    font=G_FONT)
 
-        self.version_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.frm_version_left.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.version.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        self.version_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.RIGHT)
         self.time_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.RIGHT)
 
     def openDir(self):
@@ -221,34 +244,42 @@ class MenuFrame(object):
         """
         self.windows_path_var.set(fd.askdirectory())
 
+    def openFile(self):
+        """
+        打开Windows文件路径
+        :return:
+        """
+        self.file_path_var.set(fd.askopenfilename())
+
     def copyClick(self):
         """
         copy按键点击
         :return:
         """
-        # if self.copy_btn['text'] == 'copy':
-        #     self.copy_btn['text'] = 'exit'
-        #     self.connect_status['text'] = '已连接'
-        #     self.connect_status['fg'] = 'green'
-        # else:
-        #     self.copy_btn['text'] = 'copy'
-        #     self.connect_status['text'] = '未连接'
-        #     self.connect_status['fg'] = 'red'
+        pass
 
     def checkClick(self):
         """
         check按键功能
         :return:
         """
-        # self.out_text.insert('insert', sys.stdout)
-        print('i test')
+        pass
 
     def sdkClick(self):
         """
         sdk按键功能区
         :return:
         """
-        print('this is a test failed and failure')
+        pass
+
+    def outClear(self):
+        """
+        清除输出内容
+        :return:
+        """
+        self.out_text['state'] = 'normal'
+        self.out_text.delete("0.0", "end")
+        self.out_text['state'] = 'disabled'
 
     def write(self, buf):
         """
@@ -256,20 +287,24 @@ class MenuFrame(object):
         :param buf:
         :return:
         """
-        self.setSpecificWord()
-        self.out_text.insert('insert', buf)
-        self.out_text.see('end')
+        self.out_text['state'] = 'normal'
+        self.setSpecificWord(buf)
+        self.out_text.insert('end', buf)
+        self.out_text['state'] = 'disabled'
 
     def flush(self):
-        self.out_text.delete("0.0", "end")
+        pass
 
-    def setSpecificWord(self):
+    def setSpecificWord(self, buf):
         """
         设置一些特殊字体
         :return: 无
         """
-        fail_list = ['failed', 'fail', 'failure']
-        self.out_text.tag_remove('found', '1.0', tk.END)
+        fail_list = ['failed', 'fail', 'failure', 'invalid', 'Error', 'error', 'None', 'none']
+        success_list = ['success', 'succeed', 'successfully', 'ok', 'OK']
+        self.out_text.tag_remove('found_failure', '1.0', tk.END)
+        self.out_text.tag_remove('found_success', '1.0', tk.END)
+        self.out_text.tag_remove('error', '1.0', tk.END)
 
         for word in fail_list:
             idx = '1.0'
@@ -277,10 +312,18 @@ class MenuFrame(object):
                 idx = self.out_text.search(word, idx, nocase=1, stopindex=tk.END)
                 if idx:
                     last_idx = '%s+%dc' % (idx, len(word))
-                    self.out_text.tag_add('found', idx, last_idx)
+                    self.out_text.tag_add('found_failure', idx, last_idx)
                     idx = last_idx
-
-        self.out_text.tag_config('found', foreground='red')
+        self.out_text.tag_config('found_failure', foreground='red')
+        for word in success_list:
+            idx = '1.0'
+            while idx:
+                idx = self.out_text.search(word, idx, nocase=1, stopindex=tk.END)
+                if idx:
+                    last_idx = '%s+%dc' % (idx, len(word))
+                    self.out_text.tag_add('found_success', idx, last_idx)
+                    idx = last_idx
+        self.out_text.tag_config('found_success', foreground='green')
 
 
 if __name__ == '__main__':
@@ -289,9 +332,8 @@ if __name__ == '__main__':
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     root.geometry()
-    root.title("Open Source Tools")
 
-    monacoFont = font.Font(family="Monaco", size=16)
+    monacoFont = tkf.Font(family="Monaco", size=16)
     root.option_add("*TCombobox*Listbox*background", "#292929")
     root.option_add("*TCombobox*Listbox*foreground", "#FFFFFF")
     root.option_add("*TCombobox*Listbox*font", monacoFont)
@@ -306,6 +348,5 @@ if __name__ == '__main__':
                          foreground="#FFFFFF")
 
     app = MenuFrame(root)
-    # app.frm.pack(fill='both', expand=1)
+    app.frm.pack(fill='both', expand=1)
     root.mainloop()
-

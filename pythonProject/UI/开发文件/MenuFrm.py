@@ -300,7 +300,7 @@ class MenuFrame(object):
         设置一些特殊字体
         :return: 无
         """
-        fail_list = ['failed', 'fail', 'failure', 'invalid', 'Error', 'error', 'None', 'none']
+        fail_list = ['failed', 'fail', 'failure', 'invalid', 'Error', 'error', 'None', 'none', 'not']
         success_list = ['success', 'succeed', 'successfully', 'ok', 'OK']
         self.out_text.tag_remove('found_failure', '1.0', tk.END)
         self.out_text.tag_remove('found_success', '1.0', tk.END)

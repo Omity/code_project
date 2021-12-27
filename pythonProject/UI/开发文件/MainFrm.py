@@ -25,7 +25,7 @@ from PIL import Image, ImageTk    # tk自带的仅支持GIF、PGM和PPM
 # 宏定义
 
 # 版本号
-VERSION = '.0.01'
+VERSION = ''
 # 函数实现
 def getImage(file):
     im = Image.open(file)

@@ -19,6 +19,7 @@ import paramiko
 import socket
 import threading
 import os
+import sys
 # 宏定义
 USE_DEBUG = 1
 # 版本号
@@ -92,18 +93,32 @@ class OpenSourceHelper(object):
                 self.client.connect(self.ip, username=self.user, password=self.pd)
             except paramiko.ssh_exception.AuthenticationException:
                 self.er_info('authentication failed')
+                self.client.close()
                 self._is_connected = False
             except paramiko.SSHException:
                 self.er_info('there was any other error connecting or establishing an SSH session')
+                self.client.close()
                 self._is_connected = False
             except socket.error:
                 self.er_info('A socket error occurred while connecting')
+                self.client.close()
                 self._is_connected = False
         else:
             self.er_info('IP or User or Passwd is none, check it!')
             self._is_connected = False
-        self.client.close()
         func(self._is_connected)
+
+    def sendLinuxCmd(self, cmd):
+        """
+        :param cmd:     linux命令
+        :return:        命令返回结果
+        """
+        stdin, stdout, stderr = self.client.exec_command(cmd)
+        result = stdout.read()
+        if not result:
+            result = stderr.read()
+
+        return result.decode()
 
 class Pscp(object):
     """
@@ -145,18 +160,21 @@ class Pscp(object):
 
     def windowToLinuxFile(self, window_path, Linux_path, Linux_ip, username, password):
         cmd = self.pscp + f'-pw {password} {window_path} {username}@{Linux_ip}:{Linux_path}'
-        os.system(cmd)
+        return cmd
+        # os.system(cmd)
 
     def windowToLinuxDir(self, window_path, Linux_path, Linux_ip, username, password):
         cmd = self.pscp + f'-pw {password} -r {window_path} {username}@{Linux_ip}:{Linux_path}'
-        os.system(cmd)
+        # os.system(cmd)
+        return cmd
 
     def linuxToWindowFile(self, Linux_path, window_path, Linux_ip, username, password):
         cmd = self.pscp + f' -pw {password} {username}@{Linux_ip}:{Linux_path} {window_path}'
-        os.system(cmd)
+        # os.system(cmd)
+        return cmd
 
     def linuxToWindowDir(self, Linux_path, window_path, Linux_ip, username, password):
         cmd = self.pscp + f' -r -pw {password} {username}@{Linux_ip}:{Linux_path} {window_path}'
-        os.system(cmd)
-
+        # os.system(cmd)
+        return cmd
 

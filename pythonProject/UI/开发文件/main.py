@@ -15,11 +15,13 @@
 """
 
 # 导入的包
+import os
 import tkinter as tk
 from MainFrm import MainFrame
 import tkinter.font as tkf
 import tkinter.ttk as ttk
-from BtnFuc import OpenSourceHelper
+from BtnFuc import OpenSourceHelper, Pscp
+import subprocess as sp
 # 宏定义
 USE_DEBUG = 1
 # 版本号
@@ -60,6 +62,7 @@ class MainOpenSource(MainFrame):
         self._is_connected = False
         # 更新版本,目前方法比较笨,后续会重新思考
         self.version = VERSION
+        self.pscp_path = '..\\tools\\pscp.exe'
         self.updateVer()
 
     def copyClick(self):
@@ -94,6 +97,9 @@ class MainOpenSource(MainFrame):
         self._is_connected = True
         self.frm_menu.copy_btn['text'] = 'exit'
         self.frm_menu.copy_btn['bg'] = 'red'
+        self.frm_menu.check_btn['state'] = 'disabled'
+        self.frm_menu.sdk_btn['state'] = 'disabled'
+        self.frm_menu.choose_path_btn['state'] = 'disabled'
         self.frm_menu.connect_status['text'] = '已连接'
         self.frm_menu.connect_status['fg'] = 'green'
         self.frm_menu.ip_entry['state'] = 'disabled'
@@ -112,6 +118,9 @@ class MainOpenSource(MainFrame):
         self.frm_menu.copy_btn['bg'] = 'lightblue'
         self.frm_menu.connect_status['text'] = '未连接'
         self.frm_menu.connect_status['fg'] = 'red'
+        self.frm_menu.check_btn['state'] = 'normal'
+        self.frm_menu.sdk_btn['state'] = 'normal'
+        self.frm_menu.choose_path_btn['state'] = 'normal'
         self.frm_menu.ip_entry['state'] = 'normal'
         self.frm_menu.user_entry['state'] = 'normal'
         self.frm_menu.pd_entry['state'] = 'normal'
@@ -128,25 +137,60 @@ class MainOpenSource(MainFrame):
         if is_connected:    # 说明连接一次成功,这个判断仅会运行一次
             self._connect()
             while self._is_connected:    # 连接标志位,可用于中断线程
-                pass
+                self.usePscp()
             pr_info('exit successfully')
         else:
             er_info('Open linux failed!')
             self._disconnect()
 
-	def usePscp(self):
-	try:
-		temp_win_path = self.frm_menu.windows_path_entry.get()
-		temp_lin_path = self.frm_menu.linux_path_entry.get()
-		if temp_win_path != '' and temp_lin_path != '':
-			temp_cmd = 
-		else:
-			de_info('Windows path or Linux path is none, check it!')
-			self._disconnect()
-	except Exception as e:
-		er_info(e)
-		self._disconnect()
-	
+    def usePscp(self):
+        """
+        调用pscp进行复制
+        :return:
+        """
+        try:
+            temp_win_path = self.frm_menu.windows_path_entry.get()
+            temp_lin_path = self.frm_menu.linux_path_entry.get()
+            if temp_win_path != '' and temp_lin_path != '':
+                temp_cmd = ' '.join(['find', '/'.join(temp_lin_path.split('/')[:-1]),
+                                     '-maxdepth 1 -type d -name', temp_lin_path.split('/')[-1]])
+                de_info(f'send command: {temp_cmd}')
+                if self.ser.sendLinuxCmd(temp_cmd) != '':  # 返回值不为空
+                    "这里保留一步,后续加入验证是否有不存在的文件,因为这会导致pscp的复制错误从而导致整个复制错乱"
+                    self.pscp = Pscp(self.pscp_path)
+                    self.pscpProcess(self.pscp.linuxToWindowDir(temp_lin_path, temp_win_path,
+                                     self.frm_menu.ip_entry.get(),
+                                     self.frm_menu.user_entry.get(),
+                                     self.frm_menu.pd_entry.get()))
+
+                    pr_info('copy successfully')
+                else:
+                    de_info(f'{temp_lin_path} not exist, check it!')
+            else:
+                de_info('Windows path or Linux path is none, check it!')
+        except Exception as e:
+            er_info(e)
+        self._disconnect()
+
+    def pscpProcess(self, cmd):
+        """
+        pscp进程,以subprocess运行,保证能捕获输出
+        :param cmd:
+        :return:
+        """
+        try:
+            self.p = sp.Popen(cmd, stderr=sp.PIPE, stdin=sp.PIPE, stdout=sp.PIPE)
+            # 保留,因为pscp好像第一次使用时需要选择yes
+            # p.stdin.write('y\r\n'.encode('GBK'))
+            # p.stdin.flush()
+            for i in self.p.stdout.readlines():
+                if self._is_connected:
+                    pr_info(i.decode('GBK'))
+                else:
+                    self.p.kill()
+        except Exception as e:
+            er_info(e)
+
     def checkClick(self):
         pr_info('new test')
 

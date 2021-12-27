@@ -134,6 +134,19 @@ class MainOpenSource(MainFrame):
             er_info('Open linux failed!')
             self._disconnect()
 
+	def usePscp(self):
+	try:
+		temp_win_path = self.frm_menu.windows_path_entry.get()
+		temp_lin_path = self.frm_menu.linux_path_entry.get()
+		if temp_win_path != '' and temp_lin_path != '':
+			temp_cmd = 
+		else:
+			de_info('Windows path or Linux path is none, check it!')
+			self._disconnect()
+	except Exception as e:
+		er_info(e)
+		self._disconnect()
+	
     def checkClick(self):
         pr_info('new test')
 

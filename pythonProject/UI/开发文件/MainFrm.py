@@ -43,6 +43,7 @@ class MainFrame(object):
     def __init__(self, master=None):
         self.root = master
         self.clear_icon = getImage('../image/clear.jpg')
+        self.loginInfo = './temp_loginInfo.txt'
         self.version = VERSION
         self.createFrame()
 

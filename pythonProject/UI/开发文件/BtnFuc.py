@@ -18,8 +18,6 @@
 import paramiko
 import socket
 import threading
-import os
-import sys
 # 宏定义
 USE_DEBUG = 1
 # 版本号

@@ -21,7 +21,7 @@ import tkinter as tk
 import tkinter.font as tkf
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
-
+from BtnFuc import OpenSourceHelper
 # 宏定义
 G_FONT = ('Monaco', 16)
 
@@ -215,7 +215,7 @@ class MenuFrame(object):
         self.frm_out_left.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.out_clear_btn.pack(fill='both', expand=0, padx=5, pady=5)
         self.out_label.pack(fill='both', expand=0, padx=5, pady=5)
-        self.s_bar.pack(fill='both', expand=1, padx=5, pady=5, side=tk.RIGHT)
+        self.s_bar.pack(fill='both', expand=0, padx=5, pady=5, side=tk.RIGHT)
         self.out_text.pack(fill='both', expand=1, padx=5, pady=5, side=tk.RIGHT)
 
     def createVerFrame(self):
@@ -291,6 +291,7 @@ class MenuFrame(object):
         self.setSpecificWord(buf)
         self.out_text.insert('end', buf)
         self.out_text['state'] = 'disabled'
+        self.out_text.see('end')
 
     def flush(self):
         pass

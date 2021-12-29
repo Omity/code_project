@@ -85,12 +85,12 @@ class MenuFrame(object):
         setting_label_list = ['IP:', 'user:', 'passwd:']
         self.frm_status_top_left = tk.Frame(self.frm_status_top)
         self.frm_status_top_right = tk.Frame(self.frm_status_top)
-        self.frm_status_top_left.pack(fill='both', expand=1, side=tk.LEFT)
+        self.frm_status_top_left.pack(fill='both', expand=0, side=tk.LEFT)
         self.frm_status_top_right.pack(fill='both', expand=1, side=tk.RIGHT)
 
         for item in setting_label_list:
             temp_label = tk.Label(self.frm_status_top, text=item, font=G_FONT, anchor='w')
-            temp_label.pack(fill='both', expand=1, padx=5, pady=5)
+            temp_label.pack(fill='both', expand=0, padx=5, pady=5)
         self.ip_entry = tk.Entry(self.frm_status_top_right, width=20)
         self.user_entry = tk.Entry(self.frm_status_top_right, width=20)
         self.pd_entry = tk.Entry(self.frm_status_top_right, width=20, show='*')
@@ -164,7 +164,7 @@ class MenuFrame(object):
         self.connect_status = tk.Radiobutton(self.frm_func_top_copy, text='未连接', fg='red', font=label_font)
         self.copy_btn = tk.Button(self.frm_func_top_copy, text='copy',
                                   width=6, bg='lightblue', font=G_FONT,
-                                  command=self.copyClick)
+                                  activebackground='green', command=self.copyClick)
 
         self.connect_status.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.copy_btn.pack(fill='both', expand=0, side=tk.RIGHT)

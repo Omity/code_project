@@ -15,6 +15,8 @@
 """
 
 # 导入的包
+import os
+import time
 import threading
 import datetime
 import tkinter as tk
@@ -68,6 +70,7 @@ class MainFrame(object):
         初始化窗口的一些参数
         :return:
         """
+        self.getLastLogin()
         self.frm_menu.version_label['text'] = self.version
         self.frm_menu.copy_btn['command'] = self.copyClick
         self.frm_menu.check_btn['command'] = self.checkClick
@@ -75,6 +78,51 @@ class MainFrame(object):
         self.frm_menu.out_clear_btn['image'] = self.clear_icon
         self.frm_menu.out_text.tag_config('green', foreground="#228B22")
         self.startTime()
+
+    def getLastLogin(self):
+        """
+        获取上次登录信息
+        :return:
+        """
+        try:
+            file_time = os.path.getmtime(self.loginInfo)
+            current = time.time()
+            if current - file_time < 15 * 60:      # 15分钟以后的登录信息将不要
+                with open(self.loginInfo, 'r') as f:
+                    temp = f.readlines()
+                self.frm_menu.ip_entry.insert(0, temp[0].split(':')[-1].strip())
+                self.frm_menu.user_entry.insert(0, temp[1].split(':')[-1].strip())
+                self.frm_menu.pd_entry.insert(0, temp[2].split(':')[-1].strip())
+                self.frm_menu.windows_path_entry.insert(0, temp[3].split(':')[-1].strip())
+                self.frm_menu.linux_path_entry.insert(0, temp[4].split(':')[-1].strip())
+            else:
+                if os.path.exists(self.loginInfo):
+                    os.remove(self.loginInfo)
+        except OSError as e:
+            # 第一次运行时不带登录信息,跳过
+            pass
+
+    def _setCurrLogin(self):
+        """
+        记录此次登录信息,只有在尝试链接成功以后才能调用
+        格式为:          ip: xx
+                         user: xx
+                         pd: xx
+                         win_path: xx
+                         lin_path: xx
+        :return:
+        """
+        temp1 = self.frm_menu.ip_entry.get()
+        temp2 = self.frm_menu.user_entry.get()
+        temp3 = self.frm_menu.pd_entry.get()
+        temp4 = self.frm_menu.windows_path_entry.get()
+        temp5 = self.frm_menu.linux_path_entry.get()
+        with open(self.loginInfo, 'w') as f:
+            f.write(''.join(['ip:', temp1, '\n']))
+            f.write(''.join(['user:', temp2, '\n']))
+            f.write(''.join(['pd:', temp3, '\n']))
+            f.write(''.join(['win_path:', temp4, '\n']))
+            f.write(''.join(['lin_path:', temp5, '\n']))
 
     @staticmethod
     def startThreadTimer(callback, timer=1):

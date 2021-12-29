@@ -19,3 +19,7 @@ Text   文本
 	tag_config()  打标签,用于多个text时
 	delete()      删除text区内容
 	
+
+pscp:
+	发现Windows端不能存在aux文件名相关的文件
+	

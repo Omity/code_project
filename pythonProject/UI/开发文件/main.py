@@ -136,8 +136,8 @@ class MainOpenSource(MainFrame):
         """
         if is_connected:    # 说明连接一次成功,这个判断仅会运行一次
             self._connect()
-            while self._is_connected:    # 连接标志位,可用于中断线程
-                self.usePscp()
+            self._setCurrLogin()  # 记录一次登录信息
+            self.usePscp()
             pr_info('exit successfully')
         else:
             er_info('Open linux failed!')

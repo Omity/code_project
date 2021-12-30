@@ -15,6 +15,7 @@
 """
 
 # 导入的包
+import os
 import paramiko
 import socket
 import threading
@@ -38,32 +39,39 @@ class OpenSourceHelper(object):
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     @staticmethod
-    def de_info(string):
+    def de_info(string, end='\n'):
         """
         测试类信息
+        :param end:
         :param string:
         :return:
         """
         if USE_DEBUG:
-            print(string)
+            print(string, end=end)
 
     @staticmethod
-    def pr_info(string):
+    def pr_info(string, end='\n'):
         """
         通知类信息
+        :param end:
         :param string:
         :return:
         """
-        print(string)
+        print(string, end=end)
 
     @staticmethod
-    def er_info(string):
+    def er_info(string, end='\n'):
         """
         错误类信息
+        :param end:
         :param string:
         :return:
         """
-        print(string)
+        print(string, end=end)
+
+    @staticmethod
+    def processBar():
+        pass
 
     def connectLinux(self, func):
         """
@@ -106,6 +114,32 @@ class OpenSourceHelper(object):
             self._is_connected = False
         func(self._is_connected)
 
+    def checkLicenseAndCopyright(self, func, path):
+        """
+        检测license和copyright线程
+        :param path: windows路径
+        :param func:
+        :return:
+        """
+        temp_thread = threading.Thread(target=self._checkLicenseAndCopyright, args=(func, path))
+        temp_thread.setDaemon(True)
+        temp_thread.start()
+
+    def _checkLicenseAndCopyright(self, func, path):
+        """
+        检测文件是否可用
+        :param func:
+        :param path:
+        :return:
+        """
+        self._is_checking = False
+        if path == '':
+            self.er_info('Windows path is none,check it!')
+        if os.path.exists(path) and os.path.isdir(path):
+            self._is_checking = True
+            self.de_info('Windows path is legal, check done...')
+        func(self._is_checking)
+
     def sendLinuxCmd(self, cmd):
         """
         :param cmd:     linux命令
@@ -115,8 +149,10 @@ class OpenSourceHelper(object):
         result = stdout.read()
         if not result:
             result = stderr.read()
-
-        return result.decode()
+        try:
+            return result.decode()
+        except UnicodeDecodeError:
+            return result.decode('gb18030', 'ignore')
 
 class Pscp(object):
     """

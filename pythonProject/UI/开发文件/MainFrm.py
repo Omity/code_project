@@ -79,6 +79,7 @@ class MainFrame(object):
         self.frm_menu.copy_btn['command'] = self.copyClick
         self.frm_menu.check_btn['command'] = self.checkClick
         self.frm_menu.sdk_btn['command'] = self.sdkClick
+        self.frm_menu.set_btn['command'] = self.setClick
         self.frm_menu.out_clear_btn['image'] = self.clear_icon
         self.frm_menu.out_text.tag_config('green', foreground="#228B22")
         self.startTime()
@@ -109,7 +110,7 @@ class MainFrame(object):
     def _setCurrLogin(self):
         """
         记录此次登录信息,只有在尝试链接成功以后才能调用
-        格式为:          ip: xx
+        格式为:           ip: xx
                          user: xx
                          pd: xx
                          win_path: xx
@@ -184,6 +185,13 @@ class MainFrame(object):
     def sdkClick(self):
         """
         SDK按键
+        :return:
+        """
+        pass
+
+    def setClick(self):
+        """
+        set按键区
         :return:
         """
         pass

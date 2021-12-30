@@ -15,43 +15,46 @@
 """
 
 # 导入的包
-import sys
+
 import time
 import tkinter as tk
-from MainFrm import MainFrame
 import tkinter.font as tkf
 import tkinter.ttk as ttk
-from BtnFuc import OpenSourceHelper, Pscp
 import subprocess as sp
+from BtnFuc import OpenSourceHelper, Pscp
+from MainFrm import MainFrame
 # 宏定义
 USE_DEBUG = 1
 # 版本号
 VERSION = 'V1.0.0'
 # 函数实现
-def de_info(string):
+def de_info(string, end='\n'):
     """
     测试类信息
+    :param end:
     :param string:
     :return:
     """
     if USE_DEBUG:
-        print(string)
+        print(string, end=end)
 
-def pr_info(string):
+def pr_info(string, end='\n'):
     """
     通知类信息
+    :param end:
     :param string:
     :return:
     """
-    print(string)
+    print(string, end=end)
 
-def er_info(string):
+def er_info(string, end='\n'):
     """
     错误类信息
+    :param end:
     :param string:
     :return:
     """
-    print(string)
+    print(string, end=end)
 # 类实现
 
 class MainOpenSource(MainFrame):
@@ -89,6 +92,27 @@ class MainOpenSource(MainFrame):
         elif self.frm_menu.copy_btn['text'] == 'exit':
             self._disconnect()
 
+    def checkClick(self):
+        """
+        check按键点击区
+        :return:
+        """
+        if self.frm_menu.check_btn['text'] == 'check':
+            try:
+                self.frm_menu.check_btn['text'] = 'exit'
+                self.frm_menu.check_btn['bg'] = 'red'
+                temp_path = self.frm_menu.windows_path_entry.get()
+                self.ser = OpenSourceHelper()
+                self.ser.checkLicenseAndCopyright(self.startChecking, temp_path)
+            except Exception as e:
+                er_info(e)
+                pr_info('failed to check')
+        else:
+            self._checked()
+
+    def setClick(self):
+        pass
+
     def _connect(self):
         """
         连接成功后的设置
@@ -96,8 +120,8 @@ class MainOpenSource(MainFrame):
         """
         pr_info('connect linux successfully')
         self._is_connected = True
-        self.frm_menu.copy_btn['text'] = 'exit'
-        self.frm_menu.copy_btn['bg'] = 'red'
+        # self.frm_menu.copy_btn['text'] = 'exit'
+        # self.frm_menu.copy_btn['bg'] = 'red'
         self.frm_menu.check_btn['state'] = 'disabled'
         self.frm_menu.sdk_btn['state'] = 'disabled'
         self.frm_menu.choose_path_btn['state'] = 'disabled'
@@ -187,8 +211,10 @@ class MainOpenSource(MainFrame):
         self.ignore_file = self.ser.sendLinuxCmd(temp_cmd + ignore_cmd1).split()
         for i in self.ignore_file:
             self.ser.de_info(i)
-        self._changeFileName(self.ignore_file)
-        self.isFileExist()
+        if self._is_connected:
+            self._changeFileName(self.ignore_file)
+        if self._is_connected:
+            self.isFileExist()
         if self._is_connected:
             pr_info(f'{self.getFileList.__name__}...done')
 
@@ -199,14 +225,17 @@ class MainOpenSource(MainFrame):
         """
         pr_info('Try to check if there is nonexistent file ...')
         temp_cmd = 'find ' + self.frm_menu.linux_path_entry.get() + ' -type f '
-        search_list = self.ser.sendLinuxCmd(temp_cmd)
+        search_list = self.ser.sendLinuxCmd(temp_cmd).split()
+        # for i in search_list:
+        #     de_info(i)
         for i in search_list:
             if self._is_connected:
                 temp_cmd = 'cat ' + i
                 self.ser.sendLinuxCmd(temp_cmd)
-                if self.ser.sendLinuxCmd('echo $?') != 0:
+                if self.ser.sendLinuxCmd('echo $?').strip() != '0':
                     try:
                         self.ser.sendLinuxCmd(f'rm {i}')
+                        de_info(f'delete: {i}')
                     except Exception as e:
                         er_info(e)
             else:
@@ -264,7 +293,7 @@ class MainOpenSource(MainFrame):
             while True:
                 if self._is_connected and self.p.poll() != 0:
                     pr_info(self.p.stdout.readline().decode('GBK').strip())
-                    time.sleep(0.5)
+                    time.sleep(0.01)
                 else:
                     self.p.kill()
                     break
@@ -273,8 +302,38 @@ class MainOpenSource(MainFrame):
         except Exception as e:
             er_info(e)
 
-    def checkClick(self):
-        pr_info(f'{self.checkClick.__name__}')
+    def startChecking(self, is_checking):
+        """
+        开始检测license和copyright
+        :param is_checking:
+        :return:
+        """
+        if is_checking:
+            self._checking()
+        else:
+            self._checked()
+
+    def _checking(self):
+        """
+        可查询
+        :return:
+        """
+        self._is_checking = True
+        self.frm_menu.windows_path_entry['state'] = 'disabled'
+        self.frm_menu.copy_btn['state'] = 'disabled'  # 防止操作同一目录
+        self.frm_menu.sdk_btn['state'] = 'disabled'
+
+    def _checked(self):
+        """
+        终止查询或者结束查询
+        :return:
+        """
+        self._is_checking = False
+        self.frm_menu.check_btn['text'] = 'check'
+        self.frm_menu.check_btn['bg'] = 'lightblue'
+        self.frm_menu.windows_path_entry['state'] = 'normal'
+        self.frm_menu.copy_btn['state'] = 'normal'  # 防止操作同一目录
+        self.frm_menu.sdk_btn['state'] = 'normal'
 
 
 if __name__ == '__main__':

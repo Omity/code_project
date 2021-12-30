@@ -42,9 +42,12 @@ class MainFrame(object):
 
     def __init__(self, master=None):
         self.root = master
+
         self.clear_icon = getImage('../image/clear.jpg')
         self.loginInfo = './temp_loginInfo.txt'
         self.version = VERSION
+        self.login_mark_time = 15
+
         self.createFrame()
 
     def createFrame(self):
@@ -88,7 +91,7 @@ class MainFrame(object):
         try:
             file_time = os.path.getmtime(self.loginInfo)
             current = time.time()
-            if current - file_time < 15 * 60:      # 15分钟以后的登录信息将不要
+            if current - file_time < self.login_mark_time * 60:      # 15分钟以后的登录信息将不要
                 with open(self.loginInfo, 'r') as f:
                     temp = f.readlines()
                 self.frm_menu.ip_entry.insert(0, temp[0].split(':')[-1].strip())

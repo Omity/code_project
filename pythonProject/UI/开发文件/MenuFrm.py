@@ -21,7 +21,6 @@ import tkinter as tk
 import tkinter.font as tkf
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
-from BtnFuc import OpenSourceHelper
 # 宏定义
 G_FONT = ('Monaco', 16)
 
@@ -32,11 +31,13 @@ G_FONT = ('Monaco', 16)
 
 # 类实现
 
+
 class MenuFrame(object):
 
     def __init__(self, master=None):
         self.root = master
         # 重定向输出和error
+        self.buf = ''
         sys.stdout = self
         sys.stderr = self
         self.createFrame()
@@ -64,18 +65,21 @@ class MenuFrame(object):
         :return: 无
         """
         self.frm_status = tk.LabelFrame(self.frm_top)
-        self.frm_status.pack(fill='both', expand=1, side=tk.LEFT)
+        self.frm_status.pack(fill='both', expand=0, side=tk.LEFT)
 
         self.title_label = tk.Label(self.frm_status, text='状态栏', font=G_FONT)
         self.frm_status_top = tk.LabelFrame(self.frm_status)
         self.frm_status_bottom = tk.LabelFrame(self.frm_status)
+        self.frm_status_setting = tk.Frame(self.frm_status)
 
         self.title_label.pack(fill='both', expand=0, padx=5, pady=5)
         self.frm_status_top.pack(fill='both', expand=0)
-        self.frm_status_bottom.pack(fill='both', expand=1)
+        self.frm_status_bottom.pack(fill='both', expand=0)
+        self.frm_status_setting.pack(fill='both', expand=0)
 
         self.createStatusTopFrame()
         self.createStatusBottomFrame()
+        self.createStatusSettingFrame()
 
     def createStatusTopFrame(self):
         """
@@ -120,6 +124,18 @@ class MenuFrame(object):
         frm_linux_path_temp.pack(fill='both', expand=0, padx=5, pady=5)
         self.linux_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.linux_path_entry.pack(fill='both', expand=0, padx=5, pady=5)
+
+    def createStatusSettingFrame(self):
+        """
+        创建状态栏的功能区,用于对UI的一些设置
+        :return:
+        """
+        # 该功能区可能有很多附加功能,故使用grid布局
+        self.set_btn = tk.Button(self.frm_status_setting, text='set',
+                                 width=3, bg='lightblue', font=G_FONT,
+                                 activebackground='green', command=self.setClick)
+
+        self.set_btn.grid(row=0, column=0)
 
     def createFunctionFrame(self):
         """
@@ -272,6 +288,13 @@ class MenuFrame(object):
         """
         pass
 
+    def setClick(self):
+        """
+        set按键功能区
+        :return:
+        """
+        pass
+
     def outClear(self):
         """
         清除输出内容
@@ -287,22 +310,24 @@ class MenuFrame(object):
         :param buf:
         :return:
         """
+        self.buf += buf
         self.out_text['state'] = 'normal'
-        self.setSpecificWord(buf)
-        self.out_text.insert('end', buf)
+        self.setSpecificWord()
+        self.out_text.insert('end', self.buf)
+        self.flush()
         self.out_text['state'] = 'disabled'
         self.out_text.see('end')
 
     def flush(self):
-        pass
+        self.buf = ''
 
-    def setSpecificWord(self, buf):
+    def setSpecificWord(self):
         """
         设置一些特殊字体
         :return: 无
         """
         fail_list = ['failed', 'fail', 'failure', 'invalid', 'Error', 'error', 'None', 'none', 'not']
-        success_list = ['success', 'succeed', 'successfully', 'ok', 'OK']
+        success_list = ['success', 'succeed', 'successfully', 'ok', 'OK', 'done', 'Done']
         self.out_text.tag_remove('found_failure', '1.0', tk.END)
         self.out_text.tag_remove('found_success', '1.0', tk.END)
         self.out_text.tag_remove('error', '1.0', tk.END)

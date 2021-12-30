@@ -15,7 +15,8 @@
 """
 
 # 导入的包
-import re
+import sys
+import time
 import tkinter as tk
 from MainFrm import MainFrame
 import tkinter.font as tkf
@@ -83,8 +84,8 @@ class MainOpenSource(MainFrame):
                                             pd=temp_passwd)
                 self.ser.connectLinux(self.startCopyFile)
             except Exception as e:
-                self.ser.er_info(e)
-                self.ser.er_info('Open linux failed!')
+                er_info(e)
+                er_info('Open linux failed!')
         elif self.frm_menu.copy_btn['text'] == 'exit':
             self._disconnect()
 
@@ -138,7 +139,6 @@ class MainOpenSource(MainFrame):
             self._connect()
             self._setCurrLogin()  # 记录一次登录信息
             self.usePscp()
-            pr_info('exit successfully')
         else:
             er_info('Open linux failed!')
             self._disconnect()
@@ -148,62 +148,78 @@ class MainOpenSource(MainFrame):
         把linux内和windows端文件名有冲突的文件改名
         :return:
         """
-        for i in range(len(file_list)):
-            count = i
-            temp = ''.join(['_', file_list[i].split('/')[-1]])
-            if self._is_connected:
-                if reverse:        # 修改名字
-                    temp_cmd = 'mv ' + file_list[i] + ' ' + '/'.join(file_list[i].split('/')[0:-1]) + '/' + temp
-                    self.ser.sendLinuxCmd(temp_cmd)
-                    self.ser.de_info(f'send command: {temp_cmd}')
-                else:              # 还原名字
-                    temp_cmd = 'mv ' + '/'.join(file_list[i].split('/')[0:-1]) + '/' + temp + ' ' + file_list[i]
-                    self.ser.sendLinuxCmd(temp_cmd)
-            else:
-                for j in range(0, count):
-                    temp_cmd = 'mv ' + '/'.join(file_list[j].split('/')[0:-1]) + '/' + temp + ' ' + file_list[j]
-                    self.ser.sendLinuxCmd(temp_cmd)
+        self.ser.pr_info('Try to modify illegal file name ...')
+        if len(file_list) != 0:
+            for i in range(len(file_list)):
+                count = i
+                temp = ''.join(['_', file_list[i].split('/')[-1]])
+                if self._is_connected:
+                    if reverse:        # 修改名字
+                        temp_cmd = 'mv ' + file_list[i] + ' ' + '/'.join(file_list[i].split('/')[0:-1]) + '/' + temp
+                        self.ser.sendLinuxCmd(temp_cmd)
+                        self.ser.de_info(f'send command: {temp_cmd}')
+                    else:              # 还原名字
+                        temp_cmd = 'mv ' + '/'.join(file_list[i].split('/')[0:-1]) + '/' + temp + ' ' + file_list[i]
+                        self.ser.sendLinuxCmd(temp_cmd)
+                else:
+                    for j in range(0, count):
+                        temp_cmd = 'mv ' + '/'.join(file_list[j].split('/')[0:-1]) + '/' + temp + ' ' + file_list[j]
+                        self.ser.sendLinuxCmd(temp_cmd)
+                    return
+        if self._is_connected:
+            pr_info(f'{self._changeFileName.__name__}...done')
 
     def getFileList(self):
         """
         获取路径文件列表
         :return: file list
         """
+        self.ser.pr_info('Try to get source file list ....')
         ignore_list = ['CON.*', 'PRN.*', 'AUX.*', 'NUL.*', 'COM1.*', 'COM2.*', 'COM3.*', 'COM4.*', 'COM5.*', 'COM6.*',
                        'COM7.*', 'COM8.*', 'COM9.*', 'LPT1.*', 'LPT2.*', 'LPT3.*', 'LPT4.*', 'LPT5.*', 'LPT6.*',
                        'LPT7.*', 'LPT8.*', 'LPT9.*']
         temp_lin_path = self.frm_menu.linux_path_entry.get()
-        temp_win_path = '\\'.join(self.frm_menu.windows_path_entry.get().split('/'))
         temp_cmd = ' '.join(['find', temp_lin_path, '-type f', '-iname', f'"{ignore_list[0]}"'])
         ignore_cmd1 = ''
         for i in ignore_list[1:]:
             ignore_cmd1 += ' '.join([' -o -iname', f'"{i}"'])
-            # ignore_cmd2 += ' '.join([' ! -iname', f'"{i}"'])
         self.ser.de_info(f'send command:{temp_cmd + ignore_cmd1}')
-        # self.ser.de_info(f'send command:{temp_cmd + ignore_cmd2}')
         self.ignore_file = self.ser.sendLinuxCmd(temp_cmd + ignore_cmd1).split()
         for i in self.ignore_file:
             self.ser.de_info(i)
         self._changeFileName(self.ignore_file)
+        self.isFileExist()
+        if self._is_connected:
+            pr_info(f'{self.getFileList.__name__}...done')
 
-        # copy_file = self.ser.sendLinuxCmd(temp_cmd + ignore_cmd2).split()
-        # # 更换成windows端的路径
-        # win_path = ['' for i in range(len(copy_file))]
-        # for i in range(len(copy_file)):
-        #     win_path[i] = temp_win_path + re.sub(temp_lin_path, '', copy_file[i]).replace('/', '\\')
-        #
-        # return ignore_file, copy_file, win_path
+    def isFileExist(self):
+        """
+        查询是否有文件不存在
+        :return:
+        """
+        pr_info('Try to check if there is nonexistent file ...')
+        temp_cmd = 'find ' + self.frm_menu.linux_path_entry.get() + ' -type f '
+        search_list = self.ser.sendLinuxCmd(temp_cmd)
+        for i in search_list:
+            if self._is_connected:
+                temp_cmd = 'cat ' + i
+                self.ser.sendLinuxCmd(temp_cmd)
+                if self.ser.sendLinuxCmd('echo $?') != 0:
+                    try:
+                        self.ser.sendLinuxCmd(f'rm {i}')
+                    except Exception as e:
+                        er_info(e)
+            else:
+                return
+        if self._is_connected:
+            pr_info(f'{self.isFileExist.__name__}...done')
 
     def usePscp(self):
         """
         调用pscp进行复制
         :return:
         """
-
         try:
-            # ignore_list = []
-            # copy_list = []
-            # win_list = []
             temp_win_path = self.frm_menu.windows_path_entry.get()
             temp_lin_path = self.frm_menu.linux_path_entry.get()
             if temp_win_path != '' and temp_lin_path != '':
@@ -212,28 +228,25 @@ class MainOpenSource(MainFrame):
                 de_info(f'send command: {temp_cmd}')
                 if self.ser.sendLinuxCmd(temp_cmd) != '':  # 返回值不为空
                     "这里保留一步,后续加入验证是否有不存在的文件,因为这会导致pscp的复制错误从而导致整个复制错乱"
-                    # ignore_list, copy_list, win_list = self.getFileList()
                     self.getFileList()
-                    # self.ser.de_info(ignore_list)
-                    # self.ser.de_info(copy_list)
-                    # self.ser.de_info(win_list)
-                    self.pscp = Pscp(self.pscp_path)
-                    # for i in range(len(copy_list)):
-                    #     if self._is_connected:
-                    self.pscpProcess(self.pscp.linuxToWindowDir(temp_lin_path, temp_win_path,
-                                     self.frm_menu.ip_entry.get(),
-                                     self.frm_menu.user_entry.get(),
-                                     self.frm_menu.pd_entry.get()))
-                    #     else:
-                    #         return
-                    pr_info('copy successfully')
+                    if self._is_connected:
+                        self.pscp = Pscp(self.pscp_path)
+                        self.pscpProcess(self.pscp.linuxToWindowDir(temp_lin_path, temp_win_path,
+                                         self.frm_menu.ip_entry.get(),
+                                         self.frm_menu.user_entry.get(),
+                                         self.frm_menu.pd_entry.get()))
+                    if self._is_connected:
+                        pr_info('copy successfully')
                 else:
                     de_info(f'{temp_lin_path} not exist, check it!')
             else:
                 de_info('Windows path or Linux path is none, check it!')
         except Exception as e:
             er_info(e)
-        self._changeFileName(self.ignore_file, reverse=False)
+            return
+        if self._is_connected:
+            self._changeFileName(self.ignore_file, reverse=False)
+            pr_info('copy file successfully')
         self._disconnect()
 
     def pscpProcess(self, cmd):
@@ -243,20 +256,25 @@ class MainOpenSource(MainFrame):
         :return:
         """
         try:
-            self.p = sp.Popen(cmd, stderr=sp.PIPE, stdin=sp.PIPE, stdout=sp.PIPE)
+            pr_info('Try to copy source ....')
+            self.p = sp.Popen(cmd, stderr=sp.STDOUT, stdin=sp.PIPE, stdout=sp.PIPE)
             # 保留,因为pscp好像第一次使用时需要选择yes
-            # p.stdin.write('y\r\n'.encode('GBK'))
-            # p.stdin.flush()
-            for i in self.p.stdout.readlines():
-                if self._is_connected:
-                    pr_info(i.decode('GBK'))
+            # self.p.stdin.write('y\r\n'.encode('GBK'))
+            # self.p.stdin.flush()
+            while True:
+                if self._is_connected and self.p.poll() != 0:
+                    pr_info(self.p.stdout.readline().decode('GBK').strip())
+                    time.sleep(0.5)
                 else:
                     self.p.kill()
+                    break
+            if self._is_connected:
+                pr_info(f'{self.pscpProcess.__name__}...done')
         except Exception as e:
             er_info(e)
 
     def checkClick(self):
-        pr_info('new test')
+        pr_info(f'{self.checkClick.__name__}')
 
 
 if __name__ == '__main__':

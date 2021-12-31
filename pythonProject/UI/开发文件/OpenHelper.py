@@ -39,7 +39,7 @@ class OpenSourceHelper(object):
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     @staticmethod
-    def de_info(string, end='\n'):
+    def de_info(string, end='\n', flush=True):
         """
         测试类信息
         :param end:
@@ -47,31 +47,46 @@ class OpenSourceHelper(object):
         :return:
         """
         if USE_DEBUG:
-            print(string, end=end)
+            print(string, end=end, flush=flush)
 
     @staticmethod
-    def pr_info(string, end='\n'):
+    def pr_info(string, end='\n', flush=True):
         """
         通知类信息
         :param end:
         :param string:
         :return:
         """
-        print(string, end=end)
+        print(string, end=end, flush=flush)
 
     @staticmethod
-    def er_info(string, end='\n'):
+    def er_info(string, end='\n', flush=True):
         """
         错误类信息
         :param end:
         :param string:
         :return:
         """
-        print(string, end=end)
+        print(string, end=end, flush=flush)
 
     @staticmethod
-    def processBar():
-        pass
+     def processBar(i, total):
+        """
+        进度条
+        :param i:
+        :param total:
+        :return:
+        """
+        if total > 100:
+            per = int(total / 100)
+            if i % per == 0:
+                print('*', end='', flush=True)
+        else:
+            if i < total:
+                print('*', end='', flush=True)
+
+        if i == total:
+            print('done')
 
     def connectLinux(self, func):
         """

@@ -21,14 +21,14 @@ import tkinter as tk
 import tkinter.font as tkf
 import tkinter.ttk as ttk
 import subprocess as sp
-from BtnFuc import OpenSourceHelper, Pscp
+from OpenHelper import OpenSourceHelper, Pscp
 from MainFrm import MainFrame
 # 宏定义
 USE_DEBUG = 1
 # 版本号
 VERSION = 'V1.0.0'
 # 函数实现
-def de_info(string, end='\n'):
+def de_info(string, end='\n', flush=True):
     """
     测试类信息
     :param end:
@@ -36,25 +36,25 @@ def de_info(string, end='\n'):
     :return:
     """
     if USE_DEBUG:
-        print(string, end=end)
+        print(string, end=end, flush=flush)
 
-def pr_info(string, end='\n'):
+def pr_info(string, end='\n', flush=True):
     """
     通知类信息
     :param end:
     :param string:
     :return:
     """
-    print(string, end=end)
+    print(string, end=end, flush=flush)
 
-def er_info(string, end='\n'):
+def er_info(string, end='\n', flush=True):
     """
     错误类信息
     :param end:
     :param string:
     :return:
     """
-    print(string, end=end)
+    print(string, end=end, flush=flush)
 # 类实现
 
 class MainOpenSource(MainFrame):
@@ -151,6 +151,8 @@ class MainOpenSource(MainFrame):
         self.frm_menu.pd_entry['state'] = 'normal'
         self.frm_menu.windows_path_entry['state'] = 'normal'
         self.frm_menu.linux_path_entry['state'] = 'normal'
+        if getattr(self, 'ser'):
+			self.ser.client.close()
         pr_info('exit successfully')
 
     def startCopyFile(self, is_connected):
@@ -218,26 +220,36 @@ class MainOpenSource(MainFrame):
         if self._is_connected:
             pr_info(f'{self.getFileList.__name__}...done')
 
-    def isFileExist(self):
+        def isFileExist(self):
         """
         查询是否有文件不存在
         :return:
         """
         pr_info('Try to check if there is nonexistent file ...')
-        temp_cmd = 'find ' + self.frm_menu.linux_path_entry.get() + ' -type f '
+        temp_cmd = 'find ' + self.frm_menu.linux_path_entry.get() + ' -type d '   # 收集目录
         search_list = self.ser.sendLinuxCmd(temp_cmd).split()
-        # for i in search_list:
-        #     de_info(i)
-        for i in search_list:
+        temp_cmd = 'find ' + self.frm_menu.linux_path_entry.get() + ' -type l '   # 收集链接
+        link_list = self.ser.sendLinuxCmd(temp_cmd).split()
+        while 1 in link_list:
+            for i in link_list:
+                if i in search_list:
+                    link_list.remove(i)
+        for i in link_list:
+            de_info(i)
+        temp = len(link_list)
+        # progress = ProgressBar()
+        for i in range(temp):
             if self._is_connected:
-                temp_cmd = 'cat ' + i
+                # pr_info(f'process: {i}/{temp}')
+                self.ser.processBar(i, temp)
+                temp_cmd = 'cat ' + link_list[i]
                 self.ser.sendLinuxCmd(temp_cmd)
                 if self.ser.sendLinuxCmd('echo $?').strip() != '0':
                     try:
-                        self.ser.sendLinuxCmd(f'rm {i}')
-                        de_info(f'delete: {i}')
+                        self.ser.sendLinuxCmd(f'rm {link_list[i]}')
                     except Exception as e:
                         er_info(e)
+                # time.sleep(0.01)
             else:
                 return
         if self._is_connected:

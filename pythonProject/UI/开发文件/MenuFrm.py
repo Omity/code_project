@@ -67,12 +67,12 @@ class MenuFrame(object):
         self.frm_status = tk.LabelFrame(self.frm_top)
         self.frm_status.pack(fill='both', expand=0, side=tk.LEFT)
 
-        self.title_label = tk.Label(self.frm_status, text='状态栏', font=G_FONT)
+        title_label = tk.Label(self.frm_status, text='状态栏', font=G_FONT)
         self.frm_status_top = tk.LabelFrame(self.frm_status)
         self.frm_status_bottom = tk.LabelFrame(self.frm_status)
         self.frm_status_setting = tk.Frame(self.frm_status)
 
-        self.title_label.pack(fill='both', expand=0, padx=5, pady=5)
+        title_label.pack(fill='both', expand=0, padx=5, pady=5)
         self.frm_status_top.pack(fill='both', expand=0)
         self.frm_status_bottom.pack(fill='both', expand=0)
         self.frm_status_setting.pack(fill='both', expand=0)
@@ -111,18 +111,18 @@ class MenuFrame(object):
         self.windows_path_var = tk.StringVar()
         frm_windows_path_temp = tk.Frame(self.frm_status_bottom)
         frm_linux_path_temp = tk.Frame(self.frm_status_bottom)
-        self.windows_path_label = tk.Label(frm_windows_path_temp, text='Windows Path:', font=G_FONT)
+        windows_path_label = tk.Label(frm_windows_path_temp, text='Windows Path:', font=G_FONT)
         self.choose_path_btn = tk.Button(frm_windows_path_temp, text='...', command=self.openDir)
         self.windows_path_entry = tk.Entry(self.frm_status_bottom, width=20, textvariable=self.windows_path_var)
-        self.linux_path_label = tk.Label(frm_linux_path_temp, text='Linux Path:', font=G_FONT)
+        linux_path_label = tk.Label(frm_linux_path_temp, text='Linux Path:', font=G_FONT)
         self.linux_path_entry = tk.Entry(self.frm_status_bottom, width=20)
 
         frm_windows_path_temp.pack(fill='both', expand=0, padx=5, pady=5)
-        self.windows_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        windows_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.choose_path_btn.pack(fill='x', expand=0, padx=5, pady=5, side=tk.RIGHT)
         self.windows_path_entry.pack(fill='both', expand=0, padx=5, pady=5)
         frm_linux_path_temp.pack(fill='both', expand=0, padx=5, pady=5)
-        self.linux_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        linux_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.linux_path_entry.pack(fill='both', expand=0, padx=5, pady=5)
 
     def createStatusSettingFrame(self):
@@ -205,14 +205,14 @@ class MenuFrame(object):
         创建sdk功能区
         """
         self.file_path_var = tk.StringVar()
-        self.file_path_label = tk.Label(self.frm_func_top_sdk, text='file:', font=G_FONT)
+        file_path_label = tk.Label(self.frm_func_top_sdk, text='file:', font=G_FONT)
         self.file_path_entry = tk.Entry(self.frm_func_top_sdk, width=20, textvariable=self.file_path_var)
         self.file_path_btn = tk.Button(self.frm_func_top_sdk, text='...', command=self.openFile)
         self.sdk_btn = tk.Button(self.frm_func_top_sdk, text='sdk',
                                  width=6, bg='lightblue', font=G_FONT,
                                  activebackground='green', command=self.sdkClick)
 
-        self.file_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        file_path_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.file_path_entry.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.file_path_btn.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.sdk_btn.pack(fill='both', expand=0, side=tk.RIGHT)
@@ -223,14 +223,14 @@ class MenuFrame(object):
         """
         self.frm_out_left = tk.Frame(self.frm_function_bot)
         self.out_clear_btn = tk.Button(self.frm_out_left, command=self.outClear)
-        self.out_label = tk.Label(self.frm_out_left, text='\n\n输\n\n\n\n出', font=G_FONT)
+        out_label = tk.Label(self.frm_out_left, text='\n\n输\n\n\n\n出', font=G_FONT)
         self.s_bar = tk.Scrollbar(self.frm_function_bot)
         self.out_text = tk.Text(self.frm_function_bot, state='disabled', yscrollcommand=self.s_bar.set)
 
         self.s_bar.config(command=self.out_text.yview)
         self.frm_out_left.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.out_clear_btn.pack(fill='both', expand=0, padx=5, pady=5)
-        self.out_label.pack(fill='both', expand=0, padx=5, pady=5)
+        out_label.pack(fill='both', expand=0, padx=5, pady=5)
         self.s_bar.pack(fill='both', expand=0, padx=5, pady=5, side=tk.RIGHT)
         self.out_text.pack(fill='both', expand=1, padx=5, pady=5, side=tk.RIGHT)
 
@@ -243,13 +243,13 @@ class MenuFrame(object):
         self.frm_version.pack(fill='both', expand=0, side=tk.BOTTOM)
 
         self.frm_version_left = tk.Frame(self.frm_version)
-        self.version = tk.Label(self.frm_version_left, text='Version:', font=G_FONT)
-        self.version_label = tk.Label(self.frm_version_left, text='Version:', font=G_FONT)
+        version = tk.Label(self.frm_version_left, text='Version:', font=G_FONT)
+        self.version_label = tk.Label(self.frm_version_left, text='', font=G_FONT)
         self.time_label = tk.Label(self.frm_version, text=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                                    font=G_FONT)
 
         self.frm_version_left.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
-        self.version.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
+        version.pack(fill='both', expand=0, padx=5, pady=5, side=tk.LEFT)
         self.version_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.RIGHT)
         self.time_label.pack(fill='both', expand=0, padx=5, pady=5, side=tk.RIGHT)
 
@@ -326,8 +326,8 @@ class MenuFrame(object):
         设置一些特殊字体
         :return: 无
         """
-        fail_list = ['failed', 'fail', 'failure', 'invalid', 'Error', 'error', 'None', 'none', 'not']
-        success_list = ['success', 'succeed', 'successfully', 'ok', 'OK', 'done', 'Done']
+        fail_list = ('failed', 'fail', 'failure', 'invalid', 'Error', 'error', 'None', 'none', 'not')
+        success_list = ('success', 'succeed', 'successfully', 'ok', 'OK', 'done', 'Done')
         self.out_text.tag_remove('found_failure', '1.0', tk.END)
         self.out_text.tag_remove('found_success', '1.0', tk.END)
         self.out_text.tag_remove('error', '1.0', tk.END)

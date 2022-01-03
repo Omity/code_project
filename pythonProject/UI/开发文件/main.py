@@ -23,6 +23,7 @@ import tkinter.ttk as ttk
 import subprocess as sp
 from OpenHelper import OpenSourceHelper, Pscp
 from MainFrm import MainFrame
+
 # 宏定义
 USE_DEBUG = 1
 # 版本号
@@ -31,6 +32,7 @@ VERSION = 'V1.0.0'
 def de_info(string, end='\n', flush=True):
     """
     测试类信息
+    :param flush:
     :param end:
     :param string:
     :return:
@@ -41,6 +43,7 @@ def de_info(string, end='\n', flush=True):
 def pr_info(string, end='\n', flush=True):
     """
     通知类信息
+    :param flush:
     :param end:
     :param string:
     :return:
@@ -50,6 +53,7 @@ def pr_info(string, end='\n', flush=True):
 def er_info(string, end='\n', flush=True):
     """
     错误类信息
+    :param flush:
     :param end:
     :param string:
     :return:
@@ -152,8 +156,8 @@ class MainOpenSource(MainFrame):
         self.frm_menu.windows_path_entry['state'] = 'normal'
         self.frm_menu.linux_path_entry['state'] = 'normal'
         if getattr(self, 'ser'):
-			self.ser.client.close()
-        pr_info('exit successfully')
+            self.ser.client.close()
+            pr_info('exit successfully')
 
     def startCopyFile(self, is_connected):
         """
@@ -201,9 +205,9 @@ class MainOpenSource(MainFrame):
         :return: file list
         """
         self.ser.pr_info('Try to get source file list ....')
-        ignore_list = ['CON.*', 'PRN.*', 'AUX.*', 'NUL.*', 'COM1.*', 'COM2.*', 'COM3.*', 'COM4.*', 'COM5.*', 'COM6.*',
+        ignore_list = ('CON.*', 'PRN.*', 'AUX.*', 'NUL.*', 'COM1.*', 'COM2.*', 'COM3.*', 'COM4.*', 'COM5.*', 'COM6.*',
                        'COM7.*', 'COM8.*', 'COM9.*', 'LPT1.*', 'LPT2.*', 'LPT3.*', 'LPT4.*', 'LPT5.*', 'LPT6.*',
-                       'LPT7.*', 'LPT8.*', 'LPT9.*']
+                       'LPT7.*', 'LPT8.*', 'LPT9.*')
         temp_lin_path = self.frm_menu.linux_path_entry.get()
         temp_cmd = ' '.join(['find', temp_lin_path, '-type f', '-iname', f'"{ignore_list[0]}"'])
         ignore_cmd1 = ''
@@ -220,7 +224,7 @@ class MainOpenSource(MainFrame):
         if self._is_connected:
             pr_info(f'{self.getFileList.__name__}...done')
 
-        def isFileExist(self):
+    def isFileExist(self):
         """
         查询是否有文件不存在
         :return:
@@ -271,8 +275,8 @@ class MainOpenSource(MainFrame):
                     "这里保留一步,后续加入验证是否有不存在的文件,因为这会导致pscp的复制错误从而导致整个复制错乱"
                     self.getFileList()
                     if self._is_connected:
-                        self.pscp = Pscp(self.pscp_path)
-                        self.pscpProcess(self.pscp.linuxToWindowDir(temp_lin_path, temp_win_path,
+                        pscp = Pscp(self.pscp_path)
+                        self.pscpProcess(pscp.linuxToWindowDir(temp_lin_path, temp_win_path,
                                          self.frm_menu.ip_entry.get(),
                                          self.frm_menu.user_entry.get(),
                                          self.frm_menu.pd_entry.get()))
@@ -298,16 +302,16 @@ class MainOpenSource(MainFrame):
         """
         try:
             pr_info('Try to copy source ....')
-            self.p = sp.Popen(cmd, stderr=sp.STDOUT, stdin=sp.PIPE, stdout=sp.PIPE)
+            p = sp.Popen(cmd, stderr=sp.STDOUT, stdin=sp.PIPE, stdout=sp.PIPE)
             # 保留,因为pscp好像第一次使用时需要选择yes
             # self.p.stdin.write('y\r\n'.encode('GBK'))
             # self.p.stdin.flush()
             while True:
-                if self._is_connected and self.p.poll() != 0:
-                    pr_info(self.p.stdout.readline().decode('GBK').strip())
+                if self._is_connected and p.poll() != 0:
+                    pr_info(p.stdout.readline().decode('GBK').strip())
                     time.sleep(0.01)
                 else:
-                    self.p.kill()
+                    p.kill()
                     break
             if self._is_connected:
                 pr_info(f'{self.pscpProcess.__name__}...done')

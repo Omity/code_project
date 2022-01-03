@@ -103,7 +103,7 @@ class MainFrame(object):
             else:
                 if os.path.exists(self.loginInfo):
                     os.remove(self.loginInfo)
-        except OSError as e:
+        except OSError:
             # 第一次运行时不带登录信息,跳过
             pass
 

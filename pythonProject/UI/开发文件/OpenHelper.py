@@ -42,6 +42,7 @@ class OpenSourceHelper(object):
     def de_info(string, end='\n', flush=True):
         """
         测试类信息
+        :param flush:
         :param end:
         :param string:
         :return:
@@ -53,6 +54,7 @@ class OpenSourceHelper(object):
     def pr_info(string, end='\n', flush=True):
         """
         通知类信息
+        :param flush:
         :param end:
         :param string:
         :return:
@@ -63,6 +65,7 @@ class OpenSourceHelper(object):
     def er_info(string, end='\n', flush=True):
         """
         错误类信息
+        :param flush:
         :param end:
         :param string:
         :return:
@@ -70,7 +73,7 @@ class OpenSourceHelper(object):
         print(string, end=end, flush=flush)
 
     @staticmethod
-     def processBar(i, total):
+    def processBar(i, total):
         """
         进度条
         :param i:
@@ -226,4 +229,3 @@ class Pscp(object):
         cmd = self.pscp + f' -r -pw {password} {username}@{Linux_ip}:{Linux_path} {window_path}'
         # os.system(cmd)
         return cmd
-

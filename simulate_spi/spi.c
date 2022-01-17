@@ -26,6 +26,7 @@
 
 // SPI 主设备结构体
 Spi_t spi_master = {
+	.u32CS   = CS_0,
     .u32SCLK = SCLK,
     .u32MOSI = MOSI,
     .u32MISO = MISO,
@@ -80,6 +81,7 @@ err_req:
 ******************************************************************************/
 static void SPISetGpioHigh(unsigned int gpio)
 {
+	//printk("set %d to 1\n", gpio);
 	GPIO_SET_VALUE(gpio, GPIO_OUT_HIGH);
 }
 
@@ -94,6 +96,7 @@ static void SPISetGpioHigh(unsigned int gpio)
 ******************************************************************************/
 static void SPISetGpioLow(unsigned int gpio)
 {
+	//printk("set %d to 0\n", gpio);
 	GPIO_SET_VALUE(gpio, GPIO_OUT_LOW);
 }
 
@@ -303,17 +306,15 @@ static int SPIWrite(Spi_t* pstuSpi, byte* pu8Data, int s32dataLength)
 	DBG("%s start to write data...\n", __func__);
 	spin_lock(&(pstuSpi->lock));
     SPICSIsEnable(pstuSpi, SPI_CS_ENABLE);
-    spi_delay(8);
-
+	SPIDelay;
     // Write data
     for(i = 0; i < s32dataLength; i++)
     {
         ret = SPIWriteByte(pstuSpi, pu8Data[i]);
     }
 
-    spi_delay(8);
+    SPIDelay;
     SPICSIsEnable(pstuSpi, SPI_CS_DISABLE);
-    
 	spin_unlock(&(pstuSpi->lock));
     return ret;
 }
@@ -415,7 +416,7 @@ static void SPIRead(Spi_t* pstuSpi, byte* pu8Data, int s32dataLength)
 	DBG("%s start to read data...\n", __func__);
 	spin_lock(&(pstuSpi->lock));
     SPICSIsEnable(pstuSpi, SPI_CS_ENABLE);
-    spi_delay(8);
+    SPIDelay;
 
     // Read data
     for(i = 0; i < s32dataLength; i++)
@@ -423,7 +424,7 @@ static void SPIRead(Spi_t* pstuSpi, byte* pu8Data, int s32dataLength)
         pu8Data[i] = SPIReadByte(pstuSpi);
     }
 
-    spi_delay(8);
+    SPIDelay;
     SPICSIsEnable(pstuSpi, SPI_CS_DISABLE);
     
     spin_unlock(&(pstuSpi->lock));
@@ -435,7 +436,7 @@ static long spi_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	{
 		case SPI_CHOOSE_CS:
 		    DBG("SPI_COMMAND: %d-->SPI_CHOOSE_CS:  CS_%lu \n", cmd, arg);
-			spi_master.u32CS = arg;
+			spi_master.u32CS = SPI_CS_gpio[arg];
 			break;
 		case SPI_CHANGE_MODE:
 			DBG("SPI_COMMAND: %d-->SPI_CHANGE_MODE:  mode_%lu \n", cmd, arg);
@@ -498,7 +499,7 @@ static ssize_t spi_write(struct file *file, const char __user *buf, size_t len, 
 {
 	ssize_t retval = -ENOMEM;
 	loff_t pos = *f_pos;
-	
+	DBG("from user length: %lu\n", len);
 	if(pos > SPI_TRANS_DATA_LENGTH)
 		goto exit;
 	
@@ -512,6 +513,7 @@ static ssize_t spi_write(struct file *file, const char __user *buf, size_t len, 
 		retval = -EFAULT;
 		goto exit;
 	}
+	DBG("from user: %x\n", *read_write_data);
 	retval = SPIWrite(&spi_master, read_write_data, len);
 	if (retval)
 	{

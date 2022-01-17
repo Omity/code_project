@@ -17,7 +17,7 @@ else ### first check : this time KERNELRELEASE is not set yet ...
 
 $(warning First - KERNELRELEASE = $(KERNELRELEASE))
 
-the_project_path := /home/sj03955/stationMax/rk3399-android7.1-sdk
+the_project_path := /home/sj03955/auklet
 kernel_output := $(the_project_path)/kernel
 KERNELDIR := $(the_project_path)/kernel
 bin_path := $(the_project_path)/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin

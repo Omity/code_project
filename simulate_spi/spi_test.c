@@ -16,18 +16,73 @@
 #define SPI_CS_2         2
 #define SPI_CS_3         3
 
+#define SPI_MODE_0       0
+#define SPI_MODE_1       1
+#define SPI_MODE_2       2
+#define SPI_MODE_3       3
 
+#define WRITE_MAX_LENGTH  256
+typedef unsigned char Byte; 
 
-int main(int argc, char** argv)
+struct Venus_SPI_config
 {
-	printf("hello world\n");
-	char *pData = "this is a test string";
+	unsigned short reg;
+	unsigned char val;
+};
+
+struct SPI_msg
+{
+	struct Venus_SPI_config spi_msg;
+	unsigned short flags; //操作标志位
+#define SPI_M_RD       0x01  //读取标志位
+	unsigned int len;
+	Byte *buf;
+};
+
+struct Venus_SPI_config low_input_max_gain[] = {
+	{0x2F, 0x0001},
+	{0x36, 0x4000},
+	{0x32, 0xD300},
+	{0x2C, 0x800E},
+	{0x2D, 0x0000},
+	{0x2E, 0x0EF9},
+	{0x2B, 0x0400},
+};
+
+static int spi_transfer(int fd, struct SPI_msg *msgs)
+{
+	Byte b[WRITE_MAX_LENGTH];
+	if(msgs->len > WRITE_MAX_LENGTH) 
+	{
+		printf("data length too long!\n");
+		exit(1);
+	}
+	b[0] = msgs->flags & SPI_M_RD;
+	b[1] = msgs->spi_msg.reg;
+	if(msgs->flags)
+	{
+		b[2] = msgs->spi_msg.val;
+		msgs->buf = &b;
+		write(fd, msgs->buf, msgs->len);
+	}
+	else
+	{
+		msgs->buf = &b;
+		read(fd, msgs->buf, msgs->len);
+	}
 	
+	return 0;
+}
+
+
+int main(int argc, char **argv)
+{
+	printf("start to config AFE\n");
+	char *pData = (char *)(&(low_input_max_gain[0].reg));
+	struct SPI_msg low_input;
 	int fd;
-	int size;
 	int i;
 	int len;
-	char buf[10];
 	
 	if((fd = open(DEVICE_NAME, O_RDWR)) < 0)
 	{
@@ -39,13 +94,14 @@ int main(int argc, char** argv)
 		printf("ioctl err!!\n");
 		exit(1);
 	}
-	write(fd, pData, sizeof(*pData));
-	size = read(fd, buf, sizeof(buf));
-	close(fd);
-	printf("read return %d\n", size);
-	len = sizeof(buf);
+	len = sizeof(low_input_max_gain) / sizeof(struct Venus_SPI_config);
 	for(i = 0; i < len; i++)
-		printf("%d \n", buf[i]);
-	
+	{
+		low_input.spi_msg = low_input_max_gain[i];
+		low_input.flags   = !SPI_M_RD;
+		low_input.len     = 4;
+		spi_transfer(fd, &low_input);
+	}
+	close(fd);
 	return 0;
 }

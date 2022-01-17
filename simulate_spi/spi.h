@@ -25,13 +25,13 @@
 typedef unsigned char           byte;
 typedef unsigned short          word;
 
-#define GPIO2_C3                (64+16+3)
-#define GPIO2_C4                (64+16+4)
-#define GPIO2_C5                (64+16+5)
-#define GPIO2_C6                (64+16+6)           
-#define GPIO2_C7                (64+16+7)
-#define GPIO2_D0                (64+24+0)
-#define GPIO2_D1                (64+24+1)
+#define GPIO2_C3                (64+16+3)        //83
+#define GPIO2_C4                (64+16+4)        //84
+#define GPIO2_C5                (64+16+5)        //85
+#define GPIO2_C6                (64+16+6)        //86     
+#define GPIO2_C7                (64+16+7)        //87
+#define GPIO2_D0                (64+24+0)        //88
+#define GPIO2_D1                (64+24+1)        //89
 
 
 // 定义SPI四个管脚(需对应主控gpio)
@@ -58,7 +58,14 @@ typedef unsigned short          word;
 #define SPI_CHOOSE_CS         0      //选择控制的从设备
 #define SPI_CHANGE_MODE       1      //切换spi通信模式
 
-#define SPIDelay  udelay(1)
+#define SPIDelay  udelay(5)
+
+unsigned int SPI_CS_gpio[] = {
+	CS_0,
+	CS_1,
+	CS_2,
+	CS_3,
+};
 
 // SPI 通信模式
 typedef enum SPIMode

@@ -27,7 +27,7 @@ typedef unsigned char Byte;
 struct Venus_SPI_config
 {
 	unsigned short reg;
-	unsigned char val;
+	unsigned int val;
 };
 
 struct SPI_msg
@@ -62,12 +62,14 @@ static int spi_transfer(int fd, struct SPI_msg *msgs)
 	if(msgs->flags)
 	{
 		b[2] = msgs->spi_msg.val;
-		msgs->buf = &b;
-		write(fd, msgs->buf, msgs->len);
+		//msgs->buf = b;
+		//write(fd, msgs->buf, msgs->len);
+		write(fd, b, msgs->len);
 	}
 	else
 	{
-		msgs->buf = &b;
+		//msgs->buf = b;
+		write(fd, b, 3);
 		read(fd, msgs->buf, msgs->len);
 	}
 	
@@ -78,11 +80,14 @@ static int spi_transfer(int fd, struct SPI_msg *msgs)
 int main(int argc, char **argv)
 {
 	printf("start to config AFE\n");
-	char *pData = (char *)(&(low_input_max_gain[0].reg));
-	struct SPI_msg low_input;
+	//char *pData = (char *)(&(low_input_max_gain[0].reg));
+	struct SPI_msg msg;
 	int fd;
 	int i;
 	int len;
+	
+	len = sizeof(low_input_max_gain) / sizeof(struct Venus_SPI_config);
+	//printf("length: %d\n", len);
 	
 	if((fd = open(DEVICE_NAME, O_RDWR)) < 0)
 	{
@@ -94,13 +99,13 @@ int main(int argc, char **argv)
 		printf("ioctl err!!\n");
 		exit(1);
 	}
-	len = sizeof(low_input_max_gain) / sizeof(struct Venus_SPI_config);
+	
 	for(i = 0; i < len; i++)
 	{
-		low_input.spi_msg = low_input_max_gain[i];
-		low_input.flags   = !SPI_M_RD;
-		low_input.len     = 4;
-		spi_transfer(fd, &low_input);
+		msg.spi_msg = low_input_max_gain[i];
+		msg.flags   = !SPI_M_RD;
+		msg.len     = 4;
+		spi_transfer(fd, &msg);
 	}
 	close(fd);
 	return 0;

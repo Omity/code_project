@@ -9,7 +9,7 @@ $(warning Second - KERNELRELEASE = $(KERNELRELEASE))
 # obj-m := $(KO_NAME_usbtmc_dev).o
 # $(KO_NAME_usbtmc_dev)-objs += usbtmc_dev.o
 
-obj-m := spi.o
+obj-m := tc3588.o
 
 
 
@@ -22,10 +22,10 @@ kernel_output := $(the_project_path)/kernel
 KERNELDIR := $(the_project_path)/kernel
 bin_path := $(the_project_path)/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin
 
-CFLAG   =  -std=c99 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGE_FILE_SOURCE
-LDFLAG  =  -lrt  -static   -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGE_FILE_SOURCE
-CC      = ${bin_path}/aarch64-linux-gnu-gcc
-STRIP   = ${bin_path}/aarch64-linux-gnu-strip
+#CFLAG   =  -std=c99 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGE_FILE_SOURCE
+#LDFLAG  =  -lrt  -static   -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGE_FILE_SOURCE
+#CC      = ${bin_path}/aarch64-linux-gnu-gcc
+#STRIP   = ${bin_path}/aarch64-linux-gnu-strip
 
 COMMON_MAKEENV :=                                                 \
 		M=$(PWD)                                                  \
@@ -35,17 +35,12 @@ COMMON_MAKEENV :=                                                 \
 
 # all:ko clean
 # all:ko rename
-all: ko spi_test
+all: ko
 
 ko:
 	make -j32 -C $(KERNELDIR) $(COMMON_MAKEENV) modules
 
-spi_test:
-	$(CC) -Wall -g $(CFLAG) $(LDFLAG) spi_test.c -o spi_test
-	$(STRIP) spi_test
-
 clean:
 	make -j32 -C $(KERNELDIR) $(COMMON_MAKEENV) clean
-	rm -f spi_test
 
 endif

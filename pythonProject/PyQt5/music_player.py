@@ -49,17 +49,20 @@ class MusicPlayer(QWidget):
         self.buttonHLayout.setSpacing(0)
 
         self.playBtn = QPushButton()
-        # self.playBtn.setIcon(QIcon('images/play2.png'))
-        self.playBtn.setStyleSheet("QPushButton {icon: url('images/play.png')}")
+        self.playBtn.setIcon(QIcon('images/play.png'))
+        self.playBtn.setToolTip('暂停')
+        self.playBtn.setShortcut('space')
         self.forwardBtn = QPushButton()
         self.forwardBtn.setIcon(QIcon('images/forward.png'))
-        self.forwardBtn.setStyleSheet("QPushButton {icon: url('images/forward.png')}")
+        self.forwardBtn.setToolTip('下一首 Ctrl+n')
+        self.forwardBtn.setShortcut('Ctrl+n')
         self.backwardBtn = QPushButton()
         self.backwardBtn.setIcon(QIcon('images/backward.png'))
-        self.backwardBtn.setStyleSheet("QPushButton {icon: url('images/backward.png')}")
+        self.backwardBtn.setToolTip('上一首 Ctrl+f')
         self.playModeBtn = QPushButton()
         self.playModeBtn.setIcon(QIcon('images/sequence.png'))
-        self.playModeBtn.setStyleSheet("QPushButton {icon: url('images/sequence.png')}")
+        self.playModeBtn.setToolTip('顺序播放 Ctrl+m')
+        self.playModeBtn.setShortcut('Ctrl+m')
 
         self.playBtn.setObjectName('playButton')
         self.forwardBtn.setObjectName('playButton')
@@ -92,21 +95,26 @@ class MusicPlayer(QWidget):
         if self.playState:
             self.playBtn.setStyleSheet('QPushButton{icon: url("images/pause.png")}')
             self.playState = False
+            self.playBtn.setToolTip("播放")
         else:
             self.playBtn.setStyleSheet('QPushButton{icon: url("images/play.png")}')
             self.playState = True
+            self.playBtn.setToolTip("暂停")
 
     def PlayModeChange(self):
         if self.playMode == self.__PLAY_MODE_SEQUENCE:
             self.playMode = self.__PLAY_MODE_SINGLE
+            self.playModeBtn.setToolTip('单曲循环 Ctrl+m')
             self.playModeBtn.setStyleSheet("QPushButton {icon: url('images/single.png')}"
                                            "QPushButton:hover {icon: url('images/single_hover.png')}")
         elif self.playMode == self.__PLAY_MODE_SINGLE:
             self.playMode = self.__PLAY_MODE_RANDOM
+            self.playModeBtn.setToolTip('随机播放 Ctrl+m')
             self.playModeBtn.setStyleSheet("QPushButton {icon: url('images/random.png')}"
                                            "QPushButton:hover {icon: url('images/random_hover.png')}")
         elif self.playMode == self.__PLAY_MODE_RANDOM:
             self.playMode = self.__PLAY_MODE_SEQUENCE
+            self.playModeBtn.setToolTip('顺序播放 Ctrl+m')
             self.playModeBtn.setStyleSheet("QPushButton {icon: url('images/sequence.png')}"
                                            "QPushButton:hover {icon: url('images/sequence_hover.png')}")
 

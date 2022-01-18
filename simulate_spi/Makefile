@@ -35,17 +35,17 @@ COMMON_MAKEENV :=                                                 \
 
 # all:ko clean
 # all:ko rename
-all: ko spi_test
+all: ko spi_config
 
 ko:
 	make -j32 -C $(KERNELDIR) $(COMMON_MAKEENV) modules
 
-spi_test:
-	$(CC) -Wall -g $(CFLAG) $(LDFLAG) spi_test.c -o spi_test
-	$(STRIP) spi_test
+spi_config:
+	$(CC) -Wall -g $(CFLAG) $(LDFLAG) spi_test.c -o spi_config
+	$(STRIP) spi_config
 
 clean:
 	make -j32 -C $(KERNELDIR) $(COMMON_MAKEENV) clean
-	rm -f spi_test
+	rm -f spi_config
 
 endif

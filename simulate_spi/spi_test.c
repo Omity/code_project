@@ -8,8 +8,11 @@
 #include <time.h>
 #include <ctype.h>
 
+//#include "version.h"
 
 #define DEVICE_NAME      "/dev/spi_simulate"
+#define TOOL_NAME        "spi_config"
+#define VERSION          "1.0.0"
 
 //ioctl
 #define SPI_CHOOSE_CS    0
@@ -152,10 +155,19 @@ static int spi_transfer(int fd, struct SPI_msg *msgs)
 }
 
 
+static unsigned char config_info[][256] = {
+	"aaa", 
+	"aaa", 
+	"aaa", 
+	"aaa", 
+	"aaa", 
+	"aaa", 
+};
+
 static void help(void)
 {
 	fprintf(stderr, 
-		"Usage: %s [-c which_CS] [-m Mode] -g reg ...\n", __func__
+		"Usage: %s [-c which_CS] [-m Mode] [-f function] ...\n", TOOL_NAME
 	);
 }
 
@@ -163,13 +175,14 @@ int main(int argc, char **argv)
 {
 	//char *pData = (char *)(&(low_input_max_gain[0].reg));
 	struct SPI_msg msg;
+	struct Venus_SPI_config *config_array;
 	int fd;
-	int config_idx = 0, cs_idx = 0, mode_idx = 0;
+	int config_idx = 0, cs_idx = 0, mode_idx = 0, help_mask = 0, version = 1, debug = 0;
 	int arg_idx = 1;
 	int i;
-	////int len;
+	int len;
 	
-	if(argc < 3 | argc > 7)
+	if(argc > 7)
 	{
 		fprintf(stdout, "invalid parameter list\n");
 		help();
@@ -179,9 +192,41 @@ int main(int argc, char **argv)
 	{
 		switch(argv[arg_idx][1])
 		{
-			case 'c': cs_idx = atoi(argv[arg_idx + 1]); break;
-			case 'm': mode_idx = atoi(argv[arg_idx + 1]); break;
-			case 'g': config_idx = atoi(argv[arg_idx + 1]); break;
+			case 'h': help_mask = 1;break;
+			case 'v':
+			case 'V': version = 1;break;
+			case 'g':
+			case 'G': debug = 1; break;
+			case 'c':
+			case 'C': 
+				if(isdigit((int)*argv[arg_idx + 1]))
+					cs_idx = atoi(argv[arg_idx + 1]);
+				else
+				{
+					fprintf(stderr, "-c lack of parameter or parameter invalid\n");
+					exit(1);
+				}
+				break;
+			case 'm':
+			case 'M': 
+				if(isdigit((int)*argv[arg_idx + 1]))
+					mode_idx = atoi(argv[arg_idx + 1]); 
+				else
+				{
+					fprintf(stderr, "-m lack of parameter or parameter invalid\n");
+					exit(1);
+				}
+			break;
+			case 'f':
+			case 'F': 
+				if(isdigit((int)*argv[arg_idx + 1]))
+					config_idx = atoi(argv[arg_idx + 1]); 
+				else
+				{
+					fprintf(stderr, "-f lack of parameter or parameter invalid\n");
+					exit(1);
+				}
+			break;
 			default:
 				fprintf(stderr, "Error: Unsupported option \"%s\"!\n",
 				argv[arg_idx]);
@@ -190,53 +235,79 @@ int main(int argc, char **argv)
 		}
 		arg_idx++;
 	}
+	if(help_mask)
+	{
+		help();
+		exit(0);
+	}
+	if(version)
+	{
+		fprintf(stdout, "%s version: %s\n", TOOL_NAME, VERSION);
+		exit(0);
+	}
 	
 	if((fd = open(DEVICE_NAME, O_RDWR)) < 0)
 	{
 		printf("Open Device failed.\r\n");
 		exit(1);
 	}
-	if(ioctl(fd, SPI_CHOOSE_CS, SPI_CS_0) < 0)
+	//片选
+	if(ioctl(fd, SPI_CHOOSE_CS, cs_idx) < 0)
 	{
 		printf("ioctl err!!\n");
 		exit(1);
 	}
-	for(i = 0; i < 7; i++)
+	debug ? fprintf(stdout, "choose cs_%d\n", cs_idx) : 0;
+	if(mode_idx)
 	{
-		msg.spi_msg = low_max_input_gain[i];
+		if(ioctl(fd, SPI_CHANGE_MODE, mode_idx) < 0)
+		{
+			printf("ioctl err!!\n");
+			exit(1);
+		}
+		debug ? fprintf(stdout, "choose cs_%d\n", cs_idx) : 0 ;
+	}
+	
+	switch(config_idx)
+	{
+		case 0: 
+			config_array = low_max_input_gain;
+			len = sizeof(low_max_input_gain) / sizeof(struct Venus_SPI_config);
+			break;
+		case 1:
+			config_array = low_min_input_gain;
+			len = sizeof(low_min_input_gain) / sizeof(struct Venus_SPI_config);
+			break;
+		case 2:
+			config_array = low_input;
+			len = sizeof(low_input) / sizeof(struct Venus_SPI_config);
+			break;
+		case 3:
+			config_array = high_in_phase_max_gain;
+			len = sizeof(high_in_phase_max_gain) / sizeof(struct Venus_SPI_config);
+			break;
+		case 4:
+			config_array = high_in_phase_min_gain;
+			len = sizeof(high_in_phase_min_gain) / sizeof(struct Venus_SPI_config);
+			break;
+		case 5:
+			config_array = high_opposite_max_gain;
+			len = sizeof(high_opposite_max_gain) / sizeof(struct Venus_SPI_config);
+			break;
+		default:
+			config_array = low_max_input_gain;
+			len = sizeof(low_max_input_gain) / sizeof(struct Venus_SPI_config);
+			break;
+	}
+	debug ? fprintf(stdout, "choose config to: %s\n", config_info[config_idx]) : 0;
+	for(i = 0; i < len; i++)
+	{
+		msg.spi_msg = config_array[i];
 		msg.flags   = !SPI_M_RD;
 		msg.len     = 3;
+		debug ? fprintf(stdout, "reg: %02x val: %04x\n", config_array[i].reg, config_array[i].val) : 0;
 		spi_transfer(fd, &msg);
-	//usleep(5);
-		//msg.spi_msg = test_config[1];
-		//msg.flags   = SPI_M_RD;
-		//msg.len     = 2;
-		//spi_transfer(fd, &msg);
 	}
-	//msg.spi_msg = test_config[2];
-	//msg.flags   = !SPI_M_RD;
-	//msg.len     = 3;
-	//spi_transfer(fd, &msg);
-	
-	////usleep(5);
-	//msg.spi_msg = test_config[3];
-	//msg.flags   = SPI_M_RD;
-	//msg.len     = 2;
-	//spi_transfer(fd, &msg);
-	//for(i = 0; i < len; i++)
-	//{
-		//msg.spi_msg = low_input_max_gain[i];
-		//msg.flags   = !SPI_M_RD;
-		//msg.len     = 3;
-		//spi_transfer(fd, &msg);
-	//}
-	//for(i = 0; i < len; i++)
-	//{
-		//msg.spi_msg = low_input_max_gain[i];
-		//msg.flags   = SPI_M_RD;
-		//msg.len     = 2;
-		//spi_transfer(fd, &msg);
-	//}
-	//close(fd);
+	close(fd);
 	return 0;
 }

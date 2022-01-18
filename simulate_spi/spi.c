@@ -10,7 +10,7 @@
   */
 
 
-#if 1
+#if 0
 #define DBG(x...)   printk(x)
 #define DBG_PRINT
 #else
@@ -30,7 +30,7 @@ Spi_t spi_master = {
     .u32SCLK = SCLK,
     .u32MOSI = MOSI,
     .u32MISO = MISO,
-    .spiMode = Mode_1,
+    .spiMode = Mode_0,
     .spiType = SPIMaster,
     //.lock    = lock;
 };
@@ -122,6 +122,7 @@ static int SPIConfigure(struct miscdevice *pdev, Spi_t* pstuSpi)
 	
     if(pstuSpi->spiType == SPIMaster)
     {
+		DBG("set type to master\n");
 		GpioSetDirection(CS_0, "spi_cs_0", GPIO_DIRECTION_OUTPUT);
 		GpioSetDirection(CS_1, "spi_cs_1", GPIO_DIRECTION_OUTPUT);
 		GpioSetDirection(CS_2, "spi_cs_2", GPIO_DIRECTION_OUTPUT);
@@ -150,10 +151,10 @@ static int SPIConfigure(struct miscdevice *pdev, Spi_t* pstuSpi)
     switch(pstuSpi->spiMode)
     {
     case Mode_0:
-    case Mode_1:
-    case Mode_2:
-		SPISetGpioHigh(pstuSpi->u32SCLK);
 		break;
+    case Mode_1:
+		break;
+    case Mode_2:
     case Mode_3:
         SPISetGpioHigh(pstuSpi->u32SCLK);
         break;
@@ -205,9 +206,6 @@ static int SPIWriteByte(Spi_t* pstuSpi, byte u8Byte)
 		SPISetGpioLow(pstuSpi->u32SCLK);
         for(i = 7; i >= 0; i--)
         {
-            SPISetGpioLow(pstuSpi->u32SCLK);
-            SPIDelay;
-            SPISetGpioHigh(pstuSpi->u32SCLK);
             if(u8Byte & (1 << i))
             {
                 SPISetGpioHigh(pstuSpi->u32MOSI);
@@ -216,6 +214,9 @@ static int SPIWriteByte(Spi_t* pstuSpi, byte u8Byte)
             {
                 SPISetGpioLow(pstuSpi->u32MOSI);
             }
+            SPISetGpioLow(pstuSpi->u32SCLK);
+            SPIDelay;
+            SPISetGpioHigh(pstuSpi->u32SCLK);
             SPIDelay;
         }
         SPISetGpioLow(pstuSpi->u32SCLK);
@@ -225,7 +226,6 @@ static int SPIWriteByte(Spi_t* pstuSpi, byte u8Byte)
         SPISetGpioLow(pstuSpi->u32SCLK);
         for(i = 7; i >= 0; i--)
         {
-            SPISetGpioHigh(pstuSpi->u32SCLK);
             if(u8Byte & (1 << i))
             {
                 SPISetGpioHigh(pstuSpi->u32MOSI);
@@ -234,6 +234,7 @@ static int SPIWriteByte(Spi_t* pstuSpi, byte u8Byte)
             {
                 SPISetGpioLow(pstuSpi->u32MOSI);
             }
+            SPISetGpioHigh(pstuSpi->u32SCLK);
             SPIDelay;
             SPISetGpioLow(pstuSpi->u32SCLK);
             SPIDelay;
@@ -265,7 +266,6 @@ static int SPIWriteByte(Spi_t* pstuSpi, byte u8Byte)
         SPISetGpioHigh(pstuSpi->u32SCLK);
         for(i = 7; i >= 0; i--)
         {
-            SPISetGpioLow(pstuSpi->u32SCLK);
             if(u8Byte & (1 << i))
             {
                 SPISetGpioHigh(pstuSpi->u32MOSI);
@@ -274,6 +274,7 @@ static int SPIWriteByte(Spi_t* pstuSpi, byte u8Byte)
             {
                 SPISetGpioLow(pstuSpi->u32MOSI);
             }
+            SPISetGpioLow(pstuSpi->u32SCLK);
             SPIDelay;
             SPISetGpioHigh(pstuSpi->u32SCLK);
             SPIDelay;
@@ -290,6 +291,30 @@ static int SPIWriteByte(Spi_t* pstuSpi, byte u8Byte)
 
 
 /******************************************************************************
+**函数名称：__SPIWrite
+**函数功能：发送数据
+**输入参数：pstuSpi---spi结构体
+**          pu8Data---待发送数据指针
+**          s32dataLength---数据长度
+**         
+**输出参数：0
+******************************************************************************/
+static int __SPIWrite(Spi_t* pstuSpi, byte* pu8Data, int s32dataLength)
+{
+    int i = 0;
+    int ret = 0;
+
+	DBG("%s start to write data...\n", __func__);
+	// Write data
+    for(i = 0; i < s32dataLength; i++)
+    {
+        ret = SPIWriteByte(pstuSpi, pu8Data[i]);
+    }
+	DBG("%s finish to write data...\n", __func__);
+    return ret;
+}
+
+/******************************************************************************
 **函数名称：SPIWrite
 **函数功能：发送数据
 **输入参数：pstuSpi---spi结构体
@@ -298,27 +323,41 @@ static int SPIWriteByte(Spi_t* pstuSpi, byte u8Byte)
 **         
 **输出参数：0
 ******************************************************************************/
+
 static int SPIWrite(Spi_t* pstuSpi, byte* pu8Data, int s32dataLength)
 {
-    int i = 0;
-    int ret = 0;
-
-	DBG("%s start to write data...\n", __func__);
+	int ret;
+	int clk_change = GPIO_OUT_LOW;
+	switch(pstuSpi->spiMode) {
+		case Mode_0:
+		case Mode_1:
+			break;
+		case Mode_2:
+		case Mode_3:
+			clk_change = GPIO_OUT_HIGH;
+			break;
+		default:
+			break;
+	}
+	
 	spin_lock(&(pstuSpi->lock));
-    SPICSIsEnable(pstuSpi, SPI_CS_ENABLE);
+	SPICSIsEnable(pstuSpi, SPI_CS_ENABLE);
 	SPIDelay;
-    // Write data
-    for(i = 0; i < s32dataLength; i++)
-    {
-        ret = SPIWriteByte(pstuSpi, pu8Data[i]);
-    }
-
-    SPIDelay;
-    SPICSIsEnable(pstuSpi, SPI_CS_DISABLE);
+	ret = __SPIWrite(pstuSpi, pu8Data, s32dataLength);
+	SPIDelay;
+	SPICSIsEnable(pstuSpi, SPI_CS_DISABLE);
+	SPIDelay;
+	clk_change ? SPISetGpioLow(pstuSpi->u32SCLK) : SPISetGpioHigh(pstuSpi->u32SCLK);
+	SPIDelay;
+	!clk_change ? SPISetGpioLow(pstuSpi->u32SCLK) : SPISetGpioHigh(pstuSpi->u32SCLK);
 	spin_unlock(&(pstuSpi->lock));
-    return ret;
+	
+	if(ret) {
+		printk("[%s]: write failed \n", __func__);
+		return ret;
+	}
+	return 0;
 }
-
 
 /******************************************************************************
 **函数名称：SPIReadByte
@@ -333,6 +372,7 @@ static unsigned char SPIReadByte(Spi_t* pstuSpi)
 {
     int i = 0;
     byte u8readData = 0;
+    //unsigned short u16readData = 0;
 
     switch(pstuSpi->spiMode)
     {
@@ -401,6 +441,28 @@ static unsigned char SPIReadByte(Spi_t* pstuSpi)
 
 
 /******************************************************************************
+**函数名称：__SPIRead
+**函数功能：读取数据
+**输入参数：pstuSpi---spi结构体
+**          pu8Data---数据指针
+**          s32dataLength---数据长度
+**         
+**输出参数：0
+******************************************************************************/
+static void __SPIRead(Spi_t* pstuSpi, byte* pu8Data, int s32dataLength)
+{
+    int i = 0;
+
+	DBG("%s start to read data...\n", __func__);
+    // Read data
+    for(i = 0; i < s32dataLength; i++)
+    {
+        pu8Data[i] = SPIReadByte(pstuSpi);
+    }
+    DBG("%s finish to read data...\n", __func__);
+}
+
+/******************************************************************************
 **函数名称：SPIRead
 **函数功能：读取数据
 **输入参数：pstuSpi---spi结构体
@@ -411,23 +473,38 @@ static unsigned char SPIReadByte(Spi_t* pstuSpi)
 ******************************************************************************/
 static void SPIRead(Spi_t* pstuSpi, byte* pu8Data, int s32dataLength)
 {
-    int i = 0;
-
-	DBG("%s start to read data...\n", __func__);
+	int ret;
+	int clk_change = GPIO_OUT_LOW;
+	byte u8Data;
+	u8Data = pu8Data[0];
+	switch(pstuSpi->spiMode) {
+		case Mode_0:
+		case Mode_1:
+			break;
+		case Mode_2:
+		case Mode_3:
+			clk_change = GPIO_OUT_HIGH;
+			break;
+		default:
+			break;
+	}
+	
 	spin_lock(&(pstuSpi->lock));
-    SPICSIsEnable(pstuSpi, SPI_CS_ENABLE);
-    SPIDelay;
-
-    // Read data
-    for(i = 0; i < s32dataLength; i++)
-    {
-        pu8Data[i] = SPIReadByte(pstuSpi);
-    }
-
-    SPIDelay;
-    SPICSIsEnable(pstuSpi, SPI_CS_DISABLE);
-    
-    spin_unlock(&(pstuSpi->lock));
+	SPICSIsEnable(pstuSpi, SPI_CS_ENABLE);
+	SPIDelay;
+	ret = __SPIWrite(pstuSpi, &u8Data, 1);
+	__SPIRead(pstuSpi, pu8Data, s32dataLength);
+	SPIDelay;
+	SPICSIsEnable(pstuSpi, SPI_CS_DISABLE);
+	SPIDelay;
+	clk_change ? SPISetGpioLow(pstuSpi->u32SCLK) : SPISetGpioHigh(pstuSpi->u32SCLK);
+	SPIDelay;
+	!clk_change ? SPISetGpioLow(pstuSpi->u32SCLK) : SPISetGpioHigh(pstuSpi->u32SCLK);
+	spin_unlock(&(pstuSpi->lock));
+	
+	if(ret)
+		printk("[%s]: read failed\n", __func__);
+	
 }
 
 static long spi_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
@@ -464,6 +541,7 @@ static int spi_close(struct inode * inode, struct file * file)
 
 static ssize_t spi_read(struct file *file, char __user *buf, size_t len, loff_t *f_pos)
 {
+	int i;
 	int retval;
 	loff_t pos = *f_pos;
 	
@@ -476,20 +554,28 @@ static ssize_t spi_read(struct file *file, char __user *buf, size_t len, loff_t 
 		len = SPI_TRANS_DATA_LENGTH - pos;
 	pos += len;
 	
-	SPIRead(&spi_master, read_write_data, len);
-	if(!read_write_data)
-		goto exit;
-	
-	if(copy_to_user(buf, read_write_data + *f_pos, len))
+	if(copy_from_user(read_write_data, buf, len))
 	{
 		retval = -EFAULT;
 		goto exit;
 	}
+	DBG("read addr from user: %02x\n", *read_write_data);
 	
+	SPIRead(&spi_master, read_write_data, len);
+	
+	if(!read_write_data)
+		goto exit;
+	
+	if(copy_to_user(buf, read_write_data, len))
+	{
+		retval = -EFAULT;
+		goto exit;
+	}
+	for(i = 0; i < len; i++) {
+		DBG("read from MISO:%02x\n", read_write_data[i]);
+	}
 	*f_pos = pos;
-	DBG("finish read data...\n");
 	
-		
 exit:
 	return len;
 	
@@ -497,9 +583,10 @@ exit:
 
 static ssize_t spi_write(struct file *file, const char __user *buf, size_t len, loff_t *f_pos)
 {
+	int i;
 	ssize_t retval = -ENOMEM;
 	loff_t pos = *f_pos;
-	DBG("from user length: %lu\n", len);
+	DBG("from user write length: %lu\n", len);
 	if(pos > SPI_TRANS_DATA_LENGTH)
 		goto exit;
 	
@@ -508,13 +595,17 @@ static ssize_t spi_write(struct file *file, const char __user *buf, size_t len, 
 	
 	pos += len;
 	
-	if(copy_from_user(read_write_data + *f_pos, buf, len))
+	if(copy_from_user(read_write_data, buf, len))
 	{
 		retval = -EFAULT;
 		goto exit;
 	}
-	DBG("from user: %x\n", *read_write_data);
+	for(i = 0; i < len; i++) {
+		DBG("from user write: %02x\n", read_write_data[i]);
+	}
+	
 	retval = SPIWrite(&spi_master, read_write_data, len);
+	
 	if (retval)
 	{
 		printk("failed to write data...\n");
@@ -523,8 +614,6 @@ static ssize_t spi_write(struct file *file, const char __user *buf, size_t len, 
 	
 	*f_pos = pos;
 	retval = len;
-	DBG("finish write data...\n");
-	
 	
 exit:
 	return retval;

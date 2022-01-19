@@ -10,7 +10,7 @@
   */
 
 
-#if 0
+#if 1
 #define DBG(x...)   printk(x)
 #define DBG_PRINT
 #else

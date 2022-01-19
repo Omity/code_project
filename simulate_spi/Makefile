@@ -9,8 +9,8 @@ $(warning Second - KERNELRELEASE = $(KERNELRELEASE))
 # obj-m := $(KO_NAME_usbtmc_dev).o
 # $(KO_NAME_usbtmc_dev)-objs += usbtmc_dev.o
 
-obj-m := spi.o
-
+obj-m += spi.o
+obj-m += spi2k7_gpio.o
 
 
 else ### first check : this time KERNELRELEASE is not set yet ...
@@ -42,10 +42,12 @@ ko:
 
 spi_config:
 	$(CC) -Wall -g $(CFLAG) $(LDFLAG) spi_test.c -o spi_config
+	$(CC) -Wall -g $(CFLAG) $(LDFLAG) spi2k7.c -o spi2k7
 	$(STRIP) spi_config
+	$(STRIP) spi2k7
 
 clean:
 	make -j32 -C $(KERNELDIR) $(COMMON_MAKEENV) clean
-	rm -f spi_config
+	rm -f spi_config spi2k7
 
 endif

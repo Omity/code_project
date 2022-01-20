@@ -8,15 +8,15 @@
 #include <time.h>
 #include <ctype.h>
 
-#include "version.h"
 
 #define DEVICE_NAME      "/dev/spi_simulate"
 #define TOOL_NAME        "spi_config"
-
+#define VERSION          "V1.0.0"
 
 //ioctl
-#define SPI_CHOOSE_CS    0
-#define SPI_CHANGE_MODE  1
+#define SPI_MAIC         'x'
+#define SPI_CHOOSE_CS    _IO(SPI_MAIC, 0x00)
+#define SPI_CHANGE_MODE  _IO(SPI_MAIC, 0x01)
 
 #define SPI_CS_0         0
 #define SPI_CS_1         1
@@ -181,7 +181,7 @@ static void help(void)
 		"      3: 高阻1mv/div\n"
 		"      4: 高阻10mv/div\n"
 		"      5: 高阻100mv/div\n"
-		"  -r ----寄存器查询,仅可查0x00, width宽度最大256字节\n"
+		"  -r ----寄存器查询,默认查询0x00, width宽度最大256字节\n"
 		"  -h ----帮助查询\n"
 		"  -v ----版本查询\n"
 		"  注: -h -v 为单选项\n"
@@ -190,9 +190,11 @@ static void help(void)
 		"    %s\n"
 		"  Example: 读CS_1 以mode2模式2字节\n"
 		"    %s -r 2 -m 2\n"
+		"  Example: 读CS_0 0x45 默认模式 3字节\n"
+		"    %s -r @0x45 3\n"
 		"  Example: 写CS_2 以默认模式, 配置选项3\n"
 		"    %s -s 2 -f 3\n"
-		,TOOL_NAME, TOOL_NAME, TOOL_NAME, TOOL_NAME
+		,TOOL_NAME, TOOL_NAME, TOOL_NAME, TOOL_NAME, TOOL_NAME
 	);
 }
 
@@ -206,6 +208,8 @@ int main(int argc, char **argv)
 	int read_width;
 	int i;
 	int len;
+	char *p_tmp;
+	unsigned short read_addr = 0x00;
 	
 	if((argc < 2) | (argc > 7))
 	{
@@ -227,15 +231,33 @@ int main(int argc, char **argv)
 				case 'G': debug = 1; break;
 				case 'r':
 				case 'R':
-					if(isdigit((int)*argv[arg_idx + 1]))
+					if((argv[arg_idx + 1][0] == '@') && (strlen(argv[arg_idx + 1]) == 5)) //满足添加查询地址要求
 					{
-						read_idx = 1;
-						read_width = atoi(argv[arg_idx + 1]);
+						p_tmp = &argv[arg_idx + 1][1];
+						read_addr = (unsigned short)strtol(p_tmp, NULL, 16);
+						if(isdigit((int)*argv[arg_idx + 2]))
+						{
+							read_idx = 1;
+							read_width = atoi(argv[arg_idx + 2]);
+						}
+						else
+						{
+							fprintf(stderr, "-r lack of parameter or parameter invalid\n");
+							exit(1);
+						}
 					}
-					else
+					else //使用默认查询地址
 					{
-						fprintf(stderr, "-r lack of parameter or parameter invalid\n");
-						exit(1);
+						if(isdigit((int)*argv[arg_idx + 1]))
+						{
+							read_idx = 1;
+							read_width = atoi(argv[arg_idx + 1]);
+						}
+						else
+						{
+							fprintf(stderr, "-r lack of parameter or parameter invalid\n");
+							exit(1);
+						}
 					}
 					break;
 				case 's':
@@ -337,6 +359,7 @@ int main(int argc, char **argv)
 	//读寄存器,只能读0x00
 	if(read_idx)
 	{
+		read_config[0].reg = read_addr;
 		msg.spi_msg = read_config[0];
 		msg.flags   = SPI_M_RD;
 		msg.len     = read_width;

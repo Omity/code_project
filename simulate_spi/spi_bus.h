@@ -1,6 +1,3 @@
-#ifndef _SPI_BUS_H_
-#define _SPI_BUS_H_
-
 #ifndef _SPI_CPLD_DEV
 #define _SPI_CPLD_DEV
 
@@ -25,16 +22,28 @@
 #define SPI_SEL_DEV()   {int cs_sel = 1;ioctl(fd, SPI_IOC_SELECT_CS, &cs_sel);}
 
 
-#define SPI_NAME  	"/dev/spidev2.0"
+#define SPI_NAME  	"/dev/spidev1.0"
 #define SPI_MODE	0
 #define SPI_BITS	8
 #define SPI_RATE	10000000
 #define SPI_DELY	0
-#define SPI2K7_DRIVER_NAME "/dev/spi2k7_ctl"
+#define SPI2K7_DRIVER_NAME  "/dev/spi2k7_ctl"
 
-#define GPIO_A_1    0
-#define GPIO_A_2    1
-#define GPIO_A_3    2
+
+#define GPIO0_A_1    1
+#define GPIO0_A_2    2
+#define GPIO0_A_3    3
+
+#define PIN_INITB 		GPIO0_A_1
+#define PIN_PROGRAMB 	GPIO0_A_2
+#define PIN_DONE	 	GPIO0_A_3
+
+#define SPI2K7_MAGIC    'x'
+#define IOCTL_INITB     _IOR(SPI2K7_MAGIC, PIN_INITB, int)
+#define IOCTL_PROGRAMB 	_IO(SPI2K7_MAGIC, PIN_PROGRAMB)
+#define IOCTL_DONE	 	_IOR(SPI2K7_MAGIC, PIN_DONE, int)
+
+
 
 #define ACTIVE_HIGH   1
 #define ACTIVE_LOW    0
@@ -50,5 +59,4 @@ struct stPLL_lmk0482
 	unsigned int  reg;
 	unsigned char val;
 };
-#endif
 #endif

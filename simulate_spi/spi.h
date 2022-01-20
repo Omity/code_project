@@ -55,8 +55,9 @@ typedef unsigned short          word;
 #define GPIO_OUT_HIGH           1
 
 //IOCTL
-#define SPI_CHOOSE_CS         0      //选择控制的从设备
-#define SPI_CHANGE_MODE       1      //切换spi通信模式
+#define SPI_MAIC              'x'
+#define SPI_CHOOSE_CS         _IO(SPI_MAIC, 0X00)      //选择控制的从设备
+#define SPI_CHANGE_MODE       _IO(SPI_MAIC, 0X01)      //切换spi通信模式
 
 #define SPIDelay  udelay(5)
 

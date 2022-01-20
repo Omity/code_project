@@ -11,10 +11,6 @@
 #include "spi_bus.h"
 #include <errno.h>
 
-#define PIN_INITB 		GPIO_A_1
-#define PIN_PROGRAMB 	GPIO_A_2
-#define PIN_DONE	 	GPIO_A_3
-
 static uint32_t BUFSZ = 4096;
 static uint32_t BITSZ = 0x1000000;//16m
 
@@ -25,35 +21,33 @@ static void pabort(const char *s)
 }
 
 
-static int transfer(int fd, unsigned char *ts_buf, unsigned int len)
-{
-	int rx = 0;
-	int ret;
-	struct spi_ioc_transfer tr = {
-             .tx_buf = (unsigned long)ts_buf,   //定义发送缓冲区指针
-             .rx_buf = (unsigned long)&rx,   //定义接收缓冲区指针
-             .len = len,
-             .delay_usecs = SPI_DELY};
+//static int transfer(int fd, unsigned char *ts_buf, unsigned int len)
+//{
+	//int rx = 0;
+	//int ret;
+	//struct spi_ioc_transfer tr = {
+             //.tx_buf = (unsigned long)ts_buf,   //定义发送缓冲区指针
+             //.rx_buf = (unsigned long)&rx,   //定义接收缓冲区指针
+             //.len = len,
+             //.delay_usecs = SPI_DELY};
 
-    ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);//执行spidev.c中ioctl的default进行数据传输
+    //ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);//执行spidev.c中ioctl的default进行数据传输
 
-	if (ret == 1)
-	{
-        pabort("can't send spi message");
-	}
-	rx  =  rx >> 8;
-	ret =  rx & 0xff;
-	rx  =  rx >> 8;
-	rx  =  rx | (ret << 8);
-	return rx;
-}
+	//if (ret == 1)
+	//{
+        //pabort("can't send spi message");
+	//}
+	//rx  =  rx >> 8;
+	//ret =  rx & 0xff;
+	//rx  =  rx >> 8;
+	//rx  =  rx | (ret << 8);
+	//return rx;
+//}
 
 static int set_gpio_value(int fd, unsigned int gpio, int val)
 {
 	int ret;
-	printf("gpio: %u\n val: %d\n", gpio, val);
-	ret = ioctl(fd, gpio, &val);
-	printf("ret: %d\n", ret);
+	ret = ioctl(fd, gpio, val);
 	if(ret == -1)
 	{
 		printf("can\'t set %u to %d\n", gpio, val);
@@ -148,10 +142,11 @@ int down_K7(int fd, const char* bit_name)
 int main(int argc, char *argv[])
 {
 	int fd;
+	//int i;
+	//int ret;
 	int fd_drv;
+	int value = 2;
 	char* pK160S = "/rigol/SPU_BIT.bit";
-	const char *msg    = "if you believe, you will get it";
-	char buf[256];
 
 	printf("start new part\n");
 	if(argc > 1 )
@@ -166,31 +161,51 @@ int main(int argc, char *argv[])
 		printf("Down default %s\n", pK160S);
 	}
 
-	//if ((fd = open(SPI_NAME, O_RDWR)) < 0)
-		//pabort("Can't open device\n");
-	if((fd_drv = open(SPI2K7_DRIVER_NAME, O_RDWR) < 0))
+	if ((fd = open(SPI_NAME, O_RDWR)) < 0)
 		pabort("Can't open device\n");
-		
-	write(fd_drv, msg, strlen(msg));
-	read(fd_drv, buf, 13);
-	printf("get info: %s\n", buf);
+	if((fd_drv = open(SPI2K7_DRIVER_NAME, O_RDWR)) < 0)
+		pabort("Can't open device\n");
+
+
 //!TODO 在此将 PIN_PROGRAMB 脚拉低，1us后拉高
-	set_gpio_value(fd_drv, PIN_PROGRAMB, ACTIVE_LOW);
+
+	//ioctl(fd_drv, IOCTL_INITB, &value);
+	//fprintf(stdout, "return initb voltage: %d\n", value);
+	set_gpio_value(fd_drv, IOCTL_PROGRAMB, ACTIVE_LOW);
 	usleep(1);
-	set_gpio_value(fd_drv, PIN_PROGRAMB, ACTIVE_HIGH);
-	close(fd_drv);
+	set_gpio_value(fd_drv, IOCTL_PROGRAMB, ACTIVE_HIGH);
 	
-	//set_spi_bits(fd, SPI_BITS);
-	//set_spi_mode(fd, SPI_MODE);
-	//set_spi_speed(fd, 10000000);	
-	////master
-	//printf("Down K7 master\n");
-	//if(down_K7(fd, pK160S) != 0)
-	//{
-		//close(fd);
-		//pabort("!!!Down K7 slave failed\n");
-	//}
-////!TODO 在此检测 PIN_DONE是否拉高，否则重试下载
-	//close(fd);
+	//ioctl(fd_drv, IOCTL_INITB, &value);
+	//fprintf(stdout, "return initb voltage: %d\n", value);
+	while(value != 1)
+	{
+		ioctl(fd_drv, IOCTL_INITB, &value);
+		//fprintf(stdout, "return initb voltage: %d\n", value);
+	}
+	
+	set_spi_bits(fd, SPI_BITS);
+	set_spi_mode(fd, SPI_MODE);
+	set_spi_speed(fd, 10000000);	
+	//master
+	printf("Down K7 master\n");
+	if(down_K7(fd, pK160S) != 0)
+	{
+		close(fd);
+		pabort("!!!Down K7 slave failed\n");
+	}
+//!TODO 在此检测 PIN_DONE是否拉高，否则重试下载
+	ioctl(fd_drv, IOCTL_DONE, &value);
+	if(!value)
+	{
+		if(down_K7(fd, pK160S) != 0)
+		{
+			close(fd);
+			pabort("!!!Down K7 slave failed\n");
+		}
+		ioctl(fd_drv, IOCTL_DONE, &value);
+	}
+	fprintf(stdout, "return value:%d and done\n", value);
+	close(fd);
+	close(fd_drv);
 	return 0;
 }

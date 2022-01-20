@@ -10,7 +10,7 @@
   */
 
 
-#if 1
+#if 0
 #define DBG(x...)   printk(x)
 #define DBG_PRINT
 #else
@@ -22,7 +22,6 @@
 #define DRV_AUTHOR             "sn03955@rigol"
 #define DRV_DESC               "use gpio to simulate spi prtocol"
 
-//static spinlock_t lock;
 
 // SPI 主设备结构体
 Spi_t spi_master = {
@@ -32,7 +31,6 @@ Spi_t spi_master = {
     .u32MISO = MISO,
     .spiMode = Mode_0,
     .spiType = SPIMaster,
-    //.lock    = lock;
 };
 
 static byte* read_write_data;
@@ -81,7 +79,6 @@ err_req:
 ******************************************************************************/
 static void SPISetGpioHigh(unsigned int gpio)
 {
-	//printk("set %d to 1\n", gpio);
 	GPIO_SET_VALUE(gpio, GPIO_OUT_HIGH);
 }
 
@@ -96,7 +93,6 @@ static void SPISetGpioHigh(unsigned int gpio)
 ******************************************************************************/
 static void SPISetGpioLow(unsigned int gpio)
 {
-	//printk("set %d to 0\n", gpio);
 	GPIO_SET_VALUE(gpio, GPIO_OUT_LOW);
 }
 
@@ -372,7 +368,7 @@ static unsigned char SPIReadByte(Spi_t* pstuSpi)
 {
     int i = 0;
     byte u8readData = 0;
-    //unsigned short u16readData = 0;
+ 
 
     switch(pstuSpi->spiMode)
     {

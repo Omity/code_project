@@ -9,13 +9,18 @@
 #include <linux/uaccess.h>
 #include <linux/device.h>
 
-#define GPIO_A_1    0
-#define GPIO_A_2    1
-#define GPIO_A_3    2
+#define GPIO0_A_1    1
+#define GPIO0_A_2    2
+#define GPIO0_A_3    3
 
-#define PIN_INITB 		GPIO_A_1
-#define PIN_PROGRAMB 	GPIO_A_2
-#define PIN_DONE	 	GPIO_A_3
+#define PIN_INITB 		GPIO0_A_1
+#define PIN_PROGRAMB 	GPIO0_A_2
+#define PIN_DONE	 	GPIO0_A_3
+
+#define SPI2K7_MAGIC        'x'
+#define IOCTL_INITB 		_IOR(SPI2K7_MAGIC, PIN_INITB, int)
+#define IOCTL_PROGRAMB 	    _IO(SPI2K7_MAGIC, PIN_PROGRAMB)
+#define IOCTL_DONE	 	    _IOR(SPI2K7_MAGIC, PIN_DONE, int)
 
 #define ACTIVE_HIGH     1
 #define ACTIVE_LOW      0
@@ -88,14 +93,26 @@ exit:
 static long spi2k7_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	int ret;
-	printk("into spi2k7_ioctl\n");
+	int value;
+	
 	switch(cmd)
 	{
-		case PIN_INITB:
+		case IOCTL_INITB:
+				//printk("into set PIN_INITB\n");
+				value = gpio_get_value(spi2k7.initb);
+				//printk("initb value: %d\n", value);
+				if(put_user(value, (int *)arg))
+				{
+					ret = -EFAULT;
+					printk("put_user failed\n");
+					return ret;
+				}
+			break;
+		case IOCTL_PROGRAMB:
 			if(arg < 2)
 			{
-				printk("into set PIN_INITB\n");
-				gpio_set_value(cmd, arg);
+				//printk("into set PIN_PROGRAMB\n");
+				gpio_set_value(spi2k7.programb, arg);
 			}
 			else
 			{
@@ -103,32 +120,17 @@ static long spi2k7_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 				return -EINVAL;
 			}
 			break;
-		case PIN_PROGRAMB:
-			if(arg < 2)
-			{
-				printk("into set PIN_PROGRAMB\n");
-				gpio_set_value(cmd, arg);
-			}
-			else
-			{
-				printk("invalid value\n");
-				return -EINVAL;
-			}
-			break;
-		case PIN_DONE:
-			if(arg < 2)
-			{
-				ret = gpio_get_value(cmd);
-				printk("read PIN_DONE value:%d\n", ret);
-			}
-			else
-			{
-				printk("invalid value\n");
-				return -EINVAL;
-			}
+		case IOCTL_DONE:
+				value = gpio_get_value(spi2k7.done);
+				if(put_user(value, (int *)arg))
+				{
+					ret = -EFAULT;
+					printk("put_user failed\n");
+					return ret;
+				}
 			break;
 		default:
-			printk("invalid gpio set\n");
+			printk("invalid cmd\n");
 			return -EINVAL;
 	}
 	
@@ -159,6 +161,7 @@ static int spi2k7_config(spi2k7_t *pSpi2k7)
 		}
 		gpio_direction_output(pSpi2k7->programb, ACTIVE_HIGH);
 	}
+	printk("get PIN_PROGRAMB voltage: %d\n", gpio_get_value(pSpi2k7->programb));
 	printk("finish request gpio PIN_PROGRAMB\n");
 	if(gpio_is_valid(pSpi2k7->done))
 	{

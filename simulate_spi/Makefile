@@ -11,13 +11,14 @@ $(warning Second - KERNELRELEASE = $(KERNELRELEASE))
 
 obj-m += spi.o
 obj-m += spi2k7_gpio.o
-obj-m += misc_driver.o
+
 
 else ### first check : this time KERNELRELEASE is not set yet ...
 
 $(warning First - KERNELRELEASE = $(KERNELRELEASE))
 
 the_project_path := /home/sj03955/auklet
+#the_project_path := /home/sj03955/stationMax/rk3399-android7.1-sdk
 kernel_output := $(the_project_path)/kernel
 KERNELDIR := $(the_project_path)/kernel
 bin_path := $(the_project_path)/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin
@@ -43,13 +44,12 @@ ko:
 spi_config:
 	$(CC) -Wall -g $(CFLAG) $(LDFLAG) spi_config.c -o spi_config
 	$(CC) -Wall -g $(CFLAG) $(LDFLAG) spi2k7.c -o spi2k7
-	$(CC) -Wall -g $(CFLAG) $(LDFLAG) misc_driver_test.c -o misc_driver_test
+
 	$(STRIP) spi_config
 	$(STRIP) spi2k7
-	$(STRIP) misc_driver_test
 
 clean:
 	make -j32 -C $(KERNELDIR) $(COMMON_MAKEENV) clean
-	rm -f spi_config spi2k7 misc_driver_test
+	rm -f spi_config spi2k7
 
 endif

@@ -211,7 +211,7 @@ int main(int argc, char **argv)
 	char *p_tmp;
 	unsigned short read_addr = 0x00;
 	
-	if((argc < 2) | (argc > 7))
+	if(argc > 11)
 	{
 		fprintf(stdout, "invalid parameter, read help menu for more infomation\n");
 		help();

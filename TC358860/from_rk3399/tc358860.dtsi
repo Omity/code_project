@@ -1,0 +1,109 @@
+/*
+ * Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd
+ *
+ * SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+ */
+
+/ {
+	panel {
+		compatible = "simple-panel";
+		backlight = <&backlight>;
+		//bus-format = <MEDIA_BUS_FMT_RGB888_1X7X4_SPWG>;
+		//enable-gpios = <&gpio1 13 GPIO_ACTIVE_LOW>;
+		//reset-gpios = <&gpio3 4 GPIO_ACTIVE_LOW>
+
+		display-timings {
+			native-mode = <&timing0>;
+
+			timing0: timing0 {
+				clock-frequency = <72500000>;
+				hactive = <1280>;
+				vactive = <800>;
+				hfront-porch = <62>;
+				hsync-len = <10>;
+				hback-porch = <100>;
+				vfront-porch = <12>;
+				vsync-len = <8>;
+				vback-porch = <12>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <0>;
+				pixelclk-active = <0>;
+			};
+		};
+
+		port {
+			panel_in_tc358860: endpoint {
+				remote-endpoint = <&tc358860_out_panel>;
+			};
+		};
+	};
+};
+
+&backlight {
+		status = okay;
+		enable-gpios = <&gpio1 13 GPIO_ACTIVE_LOW>;
+};
+
+&i2c4 {
+	status = "okay";
+
+	tc358860: tc358860@68 {
+		compatible = "toshiba,tc358860";
+		reg = <0x68>;
+		enable-gpios = <&gpio1 24 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio2 6 GPIO_ACTIVE_HIGH>;
+		//lane-count = <2>;
+		//use-external-pwm;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				tc358860_in_edp: endpoint {
+					remote-endpoint = <&edp_out_tc358860>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				tc358860_out_panel: endpoint {
+					remote-endpoint = <&panel_in_tc358860>;
+				};
+			};
+		};
+	};
+};
+
+&edp {
+        force-hpd;
+        status = "okay";
+
+        ports {
+                port@1 {
+			reg = <1>;
+
+                        edp_out_tc358860: endpoint {
+                                remote-endpoint = <&tc358860_in_edp>;
+                        };
+                };
+        };
+};
+
+&edp_in_vopl {
+	status = "okay";
+};
+
+&edp_in_vopb {
+	status = "disabled";
+};
+
+&route_edp {
+	/delete-property/ logo,uboot;
+	connect = <&vopl_out_edp>;
+	status = "okay";
+};

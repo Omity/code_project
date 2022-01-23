@@ -198,8 +198,9 @@ class MusicPlayer(QWidget):
         self.sliderHLayout = QHBoxLayout()
         self.btnAndSliderVLayout.addLayout(self.sliderHLayout)
         self.sliderTime = QSlider(Qt.Horizontal, self)
+        self.sliderTime.setMinimum(0)
         self.sliderTime.setStyle(QStyleFactory.create('Fusion'))
-        self.sliderTime.sliderMoved[int].connect(lambda: self.player.setPosition(self.slider_time.value()))
+        self.sliderTime.sliderReleased.connect(lambda: self.player.setPosition(self.sliderTime.value()))
         self.sliderTime.setObjectName('Slider')
 
         self.leftStartTime = QLabel(time.strftime('%M:%S', time.localtime(self.player.position() / 1000)))
@@ -247,6 +248,10 @@ class MusicPlayer(QWidget):
             self.playBtn.setToolTip("暂停")
 
     def PlayModeChange(self):
+        """
+        切换播放模式
+        :return:
+        """
         if self.playMode == self.__PLAY_MODE_LOOP:
             self.playMode = self.__PLAY_MODE_SINGLE
             self.play_list.setPlaybackMode(QMediaPlaylist.CurrentItemInLoop)
@@ -294,7 +299,7 @@ class MusicPlayer(QWidget):
         管理进度条播放时间
         :return:
         """
-        self.sliderTime.setMinimum(0)
+        # self.sliderTime.setMinimum(0)
         self.sliderTime.setMaximum(self.player.duration())
         self.sliderTime.setValue(self.sliderTime.value() + 1000)
 

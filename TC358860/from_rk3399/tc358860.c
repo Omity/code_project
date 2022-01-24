@@ -14,6 +14,7 @@
 #include <drm/drm_panel.h>
 #include <drm/drm_of.h>
 #include <linux/regmap.h>
+#include <asm/delay.h>
 
 #include "drmP.h"
 #include "drm_crtc.h"
@@ -269,20 +270,20 @@ static int tc358860_bridge_get_modes(struct drm_connector *connector)
     return num_modes;
 }
 
-static void tc358860_io_voltage_setting(struct tc358860 *tc358860)
+static void tc358860_io_voltage_setting(struct tc358860_bridge *tc358860)
 {
     /* IO Voltage setting.
      * two voltage level for VDDIO, 1.8V and 3.3V.
      * default is 3.3V, only when uses 1.8V for VDDIO
      * voltage,necessary to change the register setting.
      */
-    regmap_write(tc358860->regmap,(IOB_CTRL1,0x00000001));
+    regmap_write(tc358860->regmap,IOB_CTRL1,0x00000001);
 
 }
 
-static void tc358860_boot_sequence(struct tc358860 *tc358860)
+static void tc358860_boot_sequence(struct tc358860_bridge *tc358860)
 {
-    u8 status;
+    u32 status;
     
     regmap_write(tc358860->regmap,WAIT0_CNT,0x00006590); // BootWaitCount
     regmap_write(tc358860->regmap,BOOT_SET0,0x00040408); // Boot Set0
@@ -297,9 +298,9 @@ static void tc358860_boot_sequence(struct tc358860 *tc358860)
         }while(status!=0x00000002); // Check if 0x1018<bit2:0> is expected value
 }
 
-static void tc358860_refclk_setting(struct tc358860 *tc358860)
+static void tc358860_refclk_setting(struct tc358860_bridge *tc358860)
 {
-	u8 status;
+	u32 status;
 	
 	/* Setting for 26MHz REFCLK */
 	regmap_write(tc358860->regmap, EXTCLKSEL, 0x41);   //EXTCLKSEL
@@ -326,14 +327,14 @@ static void tc358860_refclk_setting(struct tc358860 *tc358860)
 
 }
 
-static void tc358860_dprx_cad_setting(struct tc358860 *tc358860)
+static void tc358860_dprx_cad_setting(struct tc358860_bridge *tc358860)
 {
-    u8 status;
+    u32 status;
 
     /* Additional Setting for eDP */
     regmap_write(tc358860->regmap,MAX_DOWNSPREAD,0x41); // Max Downspread
-    regmap_write(tc358860->regmap,DPRX_AL_MODE_CTRL,0x0d); // AL Mode Control Link
-    regmap_write(tc358860->regmap, PL_Mainlink_REFCLK_Ctrl, 0x12); //PL Mainlink REFCLK Ctrl
+    regmap_write(tc358860->regmap, AL_MODE_CTRL_LINK,0x0d); // AL Mode Control Link
+    regmap_write(tc358860->regmap, PL_MAINLINK_REFCLK_CTRL, 0x12); //PL Mainlink REFCLK Ctrl
 	regmap_write(tc358860->regmap, FULLTRANTIME0, 0xA0); //FULLTRANTIME0
 	regmap_write(tc358860->regmap, FULLTRANTIME1, 0xF7); //FULLTRANTIME1
 	regmap_write(tc358860->regmap, FULLTRANTIME2, 0x03); //FULLTRANTIME2
@@ -463,12 +464,12 @@ static void tc358860_dprx_cad_setting(struct tc358860 *tc358860)
 
 static void tc358860_setting_for_link_training(struct tc358860_bridge *tc358860)
 {
-    u8 status;
+    u32 status;
 
     do {
 	regmap_read(tc358860->regmap,DPRX_MAINLINK_STATUS,&status);
 	udelay(100);
-    }while(status!=0x01); // Check if 0xB631<bit1:0>=01b.
+    }while((status & 0x01) != 0x01); // Check if 0xB631<bit1:0>=01b.
     
     regmap_write(tc358860->regmap,DPCD_REV,0x11); // DPCD Rev
     regmap_write(tc358860->regmap,MAX_LINK_RATE,0x06); // Max Link Rate
@@ -495,17 +496,17 @@ static void tc358860_setting_for_link_training(struct tc358860_bridge *tc358860)
     do {
 	    regmap_read(tc358860->regmap,LANE0_1_STATUS,&status);
 	    udelay(100);
-        }while(status!=0x77); // Check if 0x8202 is expected value.
+        }while((status & 0x77)!=0x77); // Check if 0x8202 is expected value.
 
     do {
 	    regmap_read(tc358860->regmap,LANE2_3_STATUS,&status);
 	    udelay(100);
-        }while(status!=0x77); //Check if 0x8203 is expected value.
+        }while((status & 0x77)!=0x77); //Check if 0x8203 is expected value.
 
 	do {
 	    regmap_read(tc358860->regmap,ALIGN_STATUS,&status);
 	    udelay(10);
-        }while(status & 0x01!=0x01); // Check if 0x8204 is expected value.
+        }while((status & 0x01)!=0x01); // Check if 0x8204 is expected value.
     
     printk("finish in checking link training status!\n");
      
@@ -513,7 +514,7 @@ static void tc358860_setting_for_link_training(struct tc358860_bridge *tc358860)
 
 static void tc358860_dsi_config(struct tc358860_bridge *tc358860)
 {
-    u8 status;
+    u32 status;
     
     /* Timing Re-Setting */
     regmap_write(tc358860->regmap,VPCTRL_LEFT_0,0x011D); // VPCTRL_LEFT
@@ -558,47 +559,47 @@ static void tc358860_dsi_config(struct tc358860_bridge *tc358860)
     regmap_write(tc358860->regmap,CQ_HEADER,0x81000105); // Short Pkt: b[7:0]=DataID,b31=En,b25=Long/Short,b24=LP/HS
     udelay(200);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* Set Pixel Format */
     regmap_write(tc358860->regmap,CQ_HEADER,0x81773A15); //Short Pkt: b[7:0]=DataID,b31=En,b25=Long/Short,b24=LP/HS
 	udelay(200);
 	regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* Set Column Address */
     regmap_write(tc358860->regmap,CQ_HEADER,0x83000539); //Long Pkt: b[7:0]=DataID, b[23:8]=WC,b31=En,b25=Long/Short,b24=LP/HS
     regmap_write(tc358860->regmap,CQ_PAYLOAD,0x0400002A); // Payload data
     regmap_write(tc358860->regmap,CQ_PAYLOAD_MIRROR_0, 0x000000FF); //Payload data
     udelay(200);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* Set Page Address */
     regmap_write(tc358860->regmap,CQ_HEADER,0x83000539); //Long Pkt: b[7:0]=DataID, b[23:8]=WC,b31=En,b25=Long/Short,b24=LP/HS
     regmap_write(tc358860->regmap,CQ_PAYLOAD,0x0600002B); // Payload data
     regmap_write(tc358860->regmap,CQ_PAYLOAD_MIRROR_0,0x0000003F);// Payload data
     udelay(200);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* Set Tear On */
     regmap_write(tc358860->regmap,CQ_HEADER,0x81003515); //Short Pkt: b[7:0]=DataID,b31=En,b25=Long/Short,b24=LP/HS
     udelay(200);
     regmap_read(tc358860->regmap,CQ_STATUS,&status);// DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* Set Tear Scanline */
     regmap_write(tc358860->regmap,CQ_HEADER,0x83000339); //Long Pkt: b[7:0]=DataID, b[23:8]=WC,b31=En,b25=Long/Short,b24=LP/HS
     regmap_write(tc358860->regmap,CQ_PAYLOAD,0x00000044); //Payload data
     udelay(200);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* Write Display Brightness */
     regmap_write(tc358860->regmap,CQ_HEADER,0x81FF5115); //Short Pkt: b[7:0]=DataID,b31=En,b25=Long/Short,b24=LP/HS
     udelay(200);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* Write Control Display */
     regmap_write(tc358860->regmap,CQ_HEADER,0x81245315); //Short Pkt: b[7:0]=DataID,b31=En,b25=Long/Short,b24=LP/HS
     udelay(200);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* Adaptive Brightness Control */
     regmap_write(tc358860->regmap,CQ_HEADER,0x81015515); // DSIG_CQ_HEADER
     udelay(200);
@@ -608,13 +609,13 @@ static void tc358860_dsi_config(struct tc358860_bridge *tc358860)
     regmap_write(tc358860->regmap,CQ_HEADER,0x81001105); // DSIG_CQ_HEADER
     udelay(200);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     mdelay(120);
     /* MCAP */
     regmap_write(tc358860->regmap,CQ_HEADER,0x8100B023); //Short Pkt: b[7:0]=DataID,b31=En,b25=Long/Short,b24=LP/HS
     udelay(200);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     
     /* Backlight Control 4 */
     regmap_write(tc358860->regmap,CQ_HEADER,0x83001429); //Long Pkt: b[7:0]=DataID, b[23:8]=WC,b31=En,b25=Long/Short,b24=LP/HS
@@ -624,39 +625,40 @@ static void tc358860_dsi_config(struct tc358860_bridge *tc358860)
     regmap_write(tc358860->regmap,CQ_PAYLOAD_MIRROR_2,0xF2E9DED1);// Payload data
     regmap_write(tc358860->regmap,CQ_PAYLOAD_MIRROR_3,0x0004FFFA);// Payload data
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
 }
 
 static void tc358860_video_enable(struct tc358860_bridge *tc358860)
 {
+	u32 status;
 	regmap_write(tc358860->regmap,FUNC_MODE_0,0x80040010); //Set DSI clock mode
     regmap_write(tc358860->regmap,DSI0_CQMODE,0x80040010); // DSI0_CQMODE
     //regmap_write(tc358860->regmap,DSI1_CQMODE,0x80040010); // DSI1_CQMODE
-    regmap_write(tc358860->regmap,(DSI0_VIDEO_START,0x00000001); // DSI0_VideoSTART
+    regmap_write(tc358860->regmap,DSI0_VIDEO_START,0x00000001); // DSI0_VideoSTART
     //regmap_write(tc358860->regmap,(DSI1_VIDEO_START,0x00000001); // DSI1_VideoSTART
     /* Check if eDP video is coming */
-    regmap_write(tc358860->regmap,(DPVIDEO_EN,0x00000001); // Set_DPVideoEn
+    regmap_write(tc358860->regmap,DPVIDEO_EN,0x00000001); // Set_DPVideoEn
     /* Command Transmission After Video Start. (Depends on LCD specification) */
     /* MCAP */
     regmap_write(tc358860->regmap,CQ_HEADER,0x8000B023); //Short Pkt: b[7:0]=DataID,b31=En,b25=Long/Short,b24=LP/HS
-    udelay(35000);
+    mdelay(35);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* Interface Setting */
     regmap_write(tc358860->regmap,CQ_HEADER,0x8014B323); //Short Pkt: b[7:0]=DataID,b31=En,b25=Long/Short,b24=LP/HS
-    udelay(35000);
+    mdelay(35);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* MCAP */
     regmap_write(tc358860->regmap,CQ_HEADER,0x8003B023); //Short Pkt: b[7:0]=DataID,b31=En,b25=Long/Short,b24=LP/HS
-    udelay(35000);
+    mdelay(35);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     /* Set Display On */
     regmap_write(tc358860->regmap,CQ_HEADER,0x80002905); //Short Pkt: b[7:0]=DataID,b31=En,b25=Long/Short,b24=LP/HS
-    udelay(35000);
+    mdelay(35);
     regmap_read(tc358860->regmap,CQ_STATUS,&status); // DSIG_CQ_STATUS
-    printk("check if <bit0> = 1 ---%u\n", status);
+    printk("check if <bit0> = 1 ---%x\n", status);
     
     //RS2_END
 }
@@ -713,7 +715,9 @@ static int tc358860_bridge_attach(struct drm_bridge *bridge)
     tc358860->connector.polled = DRM_CONNECTOR_POLL_HPD;
 
     ret = drm_connector_init(bridge->dev, &tc358860->connector,
-            &tc358860_connector_funcs, DRM_MODE_CONNECTOR_LVDS);
+			//connector属性不确定,先修改为DSI
+			&tc358860_connector_funcs, DRM_MODE_CONNECTOR_DSI);
+            //&tc358860_connector_funcs, DRM_MODE_CONNECTOR_LVDS);
     if (ret) {
         DRM_ERROR("Failed to initialize connector with drm\n");
         return ret;
@@ -769,7 +773,7 @@ static void tc358860_bridge_disable(struct drm_bridge *bridge)
 static void tc358860_bridge_pre_enable(struct drm_bridge *bridge)
 {
     struct tc358860_bridge *tc358860 = bridge_to_tc358860(bridge);
-    int ret;
+
 
     if(tc358860->pre_enabled)
         return;
@@ -785,8 +789,11 @@ static void tc358860_bridge_pre_enable(struct drm_bridge *bridge)
     }
 
     if (tc358860->panel && tc358860->panel->funcs && tc358860->panel->funcs->prepare)
-        drm_panel_prepare(tc358860->panel);
+    {
+		drm_panel_prepare(tc358860->panel);
+	}
 
+	printk("%s start to init IC\n", __func__);
     tc358860_io_voltage_setting(tc358860);
     tc358860_boot_sequence(tc358860);
     //add by sn03955
@@ -798,6 +805,7 @@ static void tc358860_bridge_pre_enable(struct drm_bridge *bridge)
     tc358860_video_enable(tc358860);
     tc358860->pre_enabled = true; 
     
+    printk("%s finish initializing IC\n", __func__);
 }
 
 static void tc358860_bridge_enable(struct drm_bridge *bridge)
@@ -829,7 +837,7 @@ struct drm_bridge_funcs tc358860_bridge_funcs = {
 };
 
 static const struct of_device_id tc358860_devices[] = { 
-    {.compatible = "toshiba,tc358860",},                                                                                                                                         
+    { .compatible = "toshiba,tc358860",},                                                                                                                                         
     {}  
 };
 
@@ -842,6 +850,7 @@ int tc358860_probe(struct i2c_client *client, const struct i2c_device_id *id)
     struct device *dev = &client->dev;
     int ret;
     
+    printk("%s start to probe\n", __func__);
     dev_info(&client->dev, "===>hgc:%s\n",__func__);
     tc358860 = devm_kzalloc(dev, sizeof(*tc358860), GFP_KERNEL);
     if (!tc358860)
@@ -910,7 +919,7 @@ static const struct i2c_device_id tc358860_i2c_table[] = {
     {}
         
 };
-MODULE_DEVICE_TABLE(i2c, tc358860_i2c_table)
+MODULE_DEVICE_TABLE(i2c, tc358860_i2c_table);
 
 
 static struct i2c_driver tc358860_driver = {

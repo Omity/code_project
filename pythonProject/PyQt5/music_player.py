@@ -23,7 +23,7 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QSlider, QLabel,
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
-from PyQt5.QtCore import QUrl, Qt, QTimer
+from PyQt5.QtCore import QUrl, Qt, QTimer, QEvent, QSize
 
 
 # from pydub import AudioSegment
@@ -112,6 +112,7 @@ class MusicPlayer(QWidget):
         self.playModeBtn.setShortcut('Ctrl+m')
 
         self.voiceBtn = QPushButton()
+        self.voiceBtn.installEventFilter(self)
         self.voiceBtn.setIcon(QIcon(f'{self.__IMAGE}/voice.png'))
         self.voiceBtn.setToolTip('静音')
 
@@ -217,6 +218,7 @@ class MusicPlayer(QWidget):
         self.sliderVoice.setRange(0, 100)
         self.sliderVoice.setValue(self.voice)
         self.sliderVoice.setStyle(QStyleFactory.create('Fusion'))
+        self.sliderVoice.setVisible(False)
         self.sliderVoice.sliderMoved.connect(lambda: self.SliderVoiceEvent(self.sliderVoice.value()))
         # self.sliderVoice.sliderReleased.connect(lambda: self.SliderVoiceEvent(self.sliderVoice.value()))
         # self.sliderVoice.setStyleSheet("QSlider#Slider:hover{height: 5}"
@@ -284,7 +286,7 @@ class MusicPlayer(QWidget):
         """
         # self.play_list.setCurrentIndex(1)
         self.play_list.next()
-        # print(self.play_list.nextIndex())
+        print(self.play_list.nextIndex())
         # print(self.player.currentMedia().canonicalUrl().path()[1:])
 
     def PreviousSong(self):
@@ -346,7 +348,18 @@ class MusicPlayer(QWidget):
             self.voiceBtn.setToolTip('静音')
             self.voiceState = 1
 
-        print(self.player.volume())
+    def eventFilter(self, obj, event):
+        """
+        重写按钮事件过滤
+        :param obj:
+        :param event:
+        :return:
+        """
+        if obj == self.voiceBtn and event.type() == QEvent.HoverEnter:
+            self.sliderVoice.setVisible(True)
+        elif obj == self.voiceBtn and event.type() == QEvent.HoverLeave:
+            self.sliderVoice.setVisible(False)
+        return super().eventFilter(obj, event)
 
 
 if __name__ == '__main__':
@@ -356,3 +369,4 @@ if __name__ == '__main__':
     ui.show()
 
     sys.exit(app.exec_())
+

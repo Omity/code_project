@@ -20,11 +20,11 @@ import os
 import time
 import configparser
 
-from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QSlider, QLabel, QStyleFactory, QToolTip
+from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QSlider, QLabel, QStyleFactory, QToolTip, QMessageBox
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
-from PyQt5.QtCore import QUrl, Qt, QTimer, QEvent, QSize
+from PyQt5.QtCore import QUrl, Qt, QTimer, QEvent
 
 
 # from pydub import AudioSegment
@@ -63,22 +63,29 @@ class MusicPlayer(QWidget):
         self.__PLAY_MODE_SINGLE = 2
         self.__PLAY_MODE_SEQUENTIAL = 3
         self.__PLAY_MODE_RANDOM = 4
-        self.__IMAGE = './images'
-        self.__MUSIC = './music'
+        # self.__IMAGE = './images'
+        # self.__MUSIC = './music'
         self.playState = False
-        self.playMode = self.__PLAY_MODE_LOOP
-        self.voice = 70
-        self.voiceState = 1      # 0表示静音
 
-        self.setGeometry(480, 480, 480, 320)
-        self.setWindowIcon(QIcon(f'{self.__IMAGE}/icon.png'))
+        if os.path.exists('setting.ini'):
+            self.LoadSetting()
+        else:
+            curPath = os.path.dirname(os.path.realpath(__file__))
+            self.__IMAGE = os.path.join(curPath, 'images')
+            self.__MUSIC = os.path.join(curPath, 'music')
+            self.playMode = self.__PLAY_MODE_LOOP
+            self.voiceState = 1  # 0表示静音
+            self.voice = 70
+            self.setGeometry(480, 480, 480, 320)
+            self.setWindowTitle('Music Player')
+
         QToolTip.setFont(QFont('microsoft Yahei', 10))  # 字体格式
-
+        self.setWindowIcon(QIcon(f'{self.__IMAGE}/icon.png'))
         # self.setWindowOpacity(0.9)  # 设置窗口透明度
         # self.setAttribute(Qt.WA_TranslucentBackground)  # 设置窗口背景透明
 
         self.Init()
-        self.LoadSetting()
+        self.SetPlayModeStyleSheet()
 
     def Init(self):
         self.LayoutInit()
@@ -91,9 +98,15 @@ class MusicPlayer(QWidget):
 
     def LayoutInit(self):
         self.mainLayout = QVBoxLayout(self)   # 主框架
+        self.bottomHLayout = QHBoxLayout()    # 底部布局
+        self.bottomLeftHLayout = QHBoxLayout()   # 左边歌曲名称布局
         self.btnAndSliderVLayout = QVBoxLayout()   # 播放按键和进度条布局
+        self.bottomRightHLayout = QHBoxLayout()    # 底部右边音量布局
 
-        self.mainLayout.addLayout(self.btnAndSliderVLayout)
+        self.mainLayout.addLayout(self.bottomHLayout, Qt.AlignBottom)
+        self.bottomHLayout.addLayout(self.bottomLeftHLayout, Qt.AlignLeft)
+        self.bottomHLayout.addLayout(self.btnAndSliderVLayout, Qt.AlignCenter)
+        self.bottomHLayout.addLayout(self.bottomRightHLayout, Qt.AlignRight)
 
     def PlayButtonInit(self):
         self.buttonHLayout = QHBoxLayout()
@@ -147,28 +160,28 @@ class MusicPlayer(QWidget):
 
         # # 默认加载模式, 由统一的变量管控,防止在初始化时出现不匹配的状态
         # if self.playState:
-            # self.playBtn.setIcon(QIcon(f'{self.__IMAGE}/play.png'))
-            # self.playBtn.setToolTip('播放')
+        #     self.playBtn.setIcon(QIcon(f'{self.__IMAGE}/play.png'))
+        #     self.playBtn.setToolTip('播放')
         # else:
-            # self.playBtn.setIcon(QIcon(f'{self.__IMAGE}/pause.png'))
-            # self.playBtn.setToolTip('暂停')
-
+        #     self.playBtn.setIcon(QIcon(f'{self.__IMAGE}/pause.png'))
+        #     self.playBtn.setToolTip('暂停')
+        #
         # if self.playMode == self.__PLAY_MODE_LOOP:
-            # self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/loop.png'))
-            # self.playModeBtn.setToolTip('循环播放 Ctrl+m')
-            # self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/loop_hover.png')}")
+        #     self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/loop.png'))
+        #     self.playModeBtn.setToolTip('循环播放 Ctrl+m')
+        #     self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/loop_hover.png')}")
         # elif self.playMode == self.__PLAY_MODE_SINGLE:
-            # self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/single.png'))
-            # self.playModeBtn.setToolTip('单曲播放 Ctrl+m')
-            # self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/single_hover.png')}")
+        #     self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/single.png'))
+        #     self.playModeBtn.setToolTip('单曲播放 Ctrl+m')
+        #     self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/single_hover.png')}")
         # elif self.playMode == self.__PLAY_MODE_SEQUENTIAL:
-            # self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/sequential.png'))
-            # self.playModeBtn.setToolTip('顺序播放 Ctrl+m')
-            # self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/sequential_hover.png')}")
+        #     self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/sequential.png'))
+        #     self.playModeBtn.setToolTip('顺序播放 Ctrl+m')
+        #     self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/sequential_hover.png')}")
         # elif self.playMode == self.__PLAY_MODE_RANDOM:
-            # self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/random.png'))
-            # self.playModeBtn.setToolTip('随机播放 Ctrl+m')
-            # self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/random_hover.png')}")
+        #     self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/random.png'))
+        #     self.playModeBtn.setToolTip('随机播放 Ctrl+m')
+        #     self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/random_hover.png')}")
 
         self.buttonHLayout.addWidget(self.playModeBtn)
         self.buttonHLayout.addWidget(self.backwardBtn)
@@ -179,7 +192,6 @@ class MusicPlayer(QWidget):
     def PlayerInit(self):
         self.play_list = QMediaPlaylist()  # 播放列表
         self.local_play_list = ScanLocalMusic(self.__MUSIC)  # 获取的是默认存放的音乐文件
-        print(self.local_play_list)
         for m in self.local_play_list:
             url = QUrl.fromLocalFile(m)
             self.play_list.addMedia(QMediaContent(url))
@@ -188,17 +200,18 @@ class MusicPlayer(QWidget):
         self.player.setVolume(self.voice)
 
         # if self.playMode == self.__PLAY_MODE_LOOP:
-            # self.play_list.setPlaybackMode(QMediaPlaylist.Loop)
+        #     self.play_list.setPlaybackMode(QMediaPlaylist.Loop)
         # elif self.playMode == self.__PLAY_MODE_SINGLE:
-            # self.play_list.setPlaybackMode(QMediaPlaylist.CurrentItemInLoop)
+        #     self.play_list.setPlaybackMode(QMediaPlaylist.CurrentItemInLoop)
         # elif self.playMode == self.__PLAY_MODE_SEQUENTIAL:
-            # self.play_list.setPlaybackMode(QMediaPlaylist.Sequential)
+        #     self.play_list.setPlaybackMode(QMediaPlaylist.Sequential)
         # elif self.playMode == self.__PLAY_MODE_RANDOM:
-            # self.play_list.setPlaybackMode(QMediaPlaylist.Random)
+        #     self.play_list.setPlaybackMode(QMediaPlaylist.Random)
 
     def SliderInit(self):
         # 播放进度条
         self.sliderHLayout = QHBoxLayout()
+        self.sliderHLayout.setSpacing(0)
         self.btnAndSliderVLayout.addLayout(self.sliderHLayout)
         self.sliderTime = QSlider(Qt.Horizontal, self)
         self.sliderTime.setMinimum(0)
@@ -235,7 +248,8 @@ class MusicPlayer(QWidget):
         self.sliderHLayout.addWidget(self.leftStartTime)
         self.sliderHLayout.addWidget(self.sliderTime)
         self.sliderHLayout.addWidget(self.rightDurationTime)
-        self.btnAndSliderVLayout.addWidget(self.sliderVoice)
+        self.bottomRightHLayout.addWidget(self.sliderVoice)
+        # self.btnAndSliderVLayout.addWidget(self.sliderVoice)
 
     def PlayBtnState(self):
         if self.playState:
@@ -250,6 +264,8 @@ class MusicPlayer(QWidget):
             self.playState = True
             self.player.play()  # 播放
             self.playBtn.setToolTip("暂停")
+
+        self.SaveSetting()
 
     def PlayModeChange(self):
         """
@@ -332,7 +348,6 @@ class MusicPlayer(QWidget):
             self.player.setVolume(self.voice)
             self.voiceBtn.setIcon(QIcon(f'{self.__IMAGE}/voice.png'))
             self.voiceBtn.setToolTip('静音')
-        self.SaveSetting()
 
     def SliderVoiceEvent(self, vol):
         """
@@ -365,14 +380,26 @@ class MusicPlayer(QWidget):
         return super().eventFilter(obj, event)
 
     def LoadSetting(self):
-        if os.path.exists('setting.ini'):
-            config = configparser.ConfigParser()
-            config.read('setting.ini')
+        config = configparser.ConfigParser()
+        config.read('setting.ini')
 
-            # 载入播放模式
-            self.playMode = int(config.get('MainConfig', 'play_mode'))
-            self.voice = int(config.get('MainConfig', 'volume'))
-            self.SetPlayModeStyleSheet()
+        # 载入路径
+        self.__IMAGE = config.get('PATH', 'images')
+        self.__MUSIC = config.get('PATH', 'music')
+
+        self.setWindowTitle(config.get('Default', 'title'))
+
+        # 载入默认大小
+        self.setGeometry(int(config.get('Default', 'start_x')),
+                         int(config.get('Default', 'start_y')),
+                         int(config.get('Default', 'width')),
+                         int(config.get('Default', 'height')))
+
+        # 载入播放模式
+        self.voiceState = int(config.get('MainConfig', 'voice_state'))
+        self.playMode = int(config.get('MainConfig', 'play_mode'))
+        self.voice = int(config.get('MainConfig', 'volume'))
+        # self.SetPlayModeStyleSheet()
 
     def SetPlayModeStyleSheet(self):
 
@@ -413,11 +440,36 @@ class MusicPlayer(QWidget):
     def SaveSetting(self):
         config = configparser.ConfigParser()
 
+        config.add_section('PATH')
+        config.set('PATH', 'images', self.__IMAGE)
+        config.set('PATH', 'music', self.__MUSIC)
+
+        config.add_section('Default')
+        config.set('Default', 'start_x', str(self.geometry().x()))
+        config.set('Default', 'start_y', str(self.geometry().y()))
+        config.set('Default', 'width', str(self.geometry().width()))
+        config.set('Default', 'height', str(self.geometry().height()))
+        config.set('Default', 'title', self.windowTitle())
+
         config.add_section('MainConfig')
+        config.set('MainConfig', 'voice_state', str(self.voiceState))
         config.set('MainConfig', 'play_mode', str(self.playMode))
         config.set('MainConfig', 'volume', str(self.voice))
         config.write(open('setting.ini', 'w'))
 
+    def closeEvent(self, QCloseEvent):
+        """
+        重写关闭事件
+        :param QCloseEvent:
+        :return:
+        """
+        res = QMessageBox.question(self, 'tips', 'Are you sure to close?',
+                                   QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if res == QMessageBox.Yes:
+            self.SaveSetting()
+            QCloseEvent.accept()
+        else:
+            QCloseEvent.ignore()
 
 
 if __name__ == '__main__':

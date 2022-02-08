@@ -18,6 +18,7 @@
 import sys
 import os
 import time
+import configparser
 
 from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QSlider, QLabel, QStyleFactory, QToolTip
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
@@ -77,6 +78,7 @@ class MusicPlayer(QWidget):
         # self.setAttribute(Qt.WA_TranslucentBackground)  # 设置窗口背景透明
 
         self.Init()
+        self.LoadSetting()
 
     def Init(self):
         self.LayoutInit()
@@ -143,30 +145,30 @@ class MusicPlayer(QWidget):
         self.forwardBtn.setStyleSheet("QPushButton:hover {icon: url('images/forward_hover.png')}")
         self.backwardBtn.setStyleSheet("QPushButton:hover {icon: url('images/backward_hover.png')}")
 
-        # 默认加载模式, 由统一的变量管控,防止在初始化时出现不匹配的状态
-        if self.playState:
-            self.playBtn.setIcon(QIcon(f'{self.__IMAGE}/play.png'))
-            self.playBtn.setToolTip('播放')
-        else:
-            self.playBtn.setIcon(QIcon(f'{self.__IMAGE}/pause.png'))
-            self.playBtn.setToolTip('暂停')
+        # # 默认加载模式, 由统一的变量管控,防止在初始化时出现不匹配的状态
+        # if self.playState:
+            # self.playBtn.setIcon(QIcon(f'{self.__IMAGE}/play.png'))
+            # self.playBtn.setToolTip('播放')
+        # else:
+            # self.playBtn.setIcon(QIcon(f'{self.__IMAGE}/pause.png'))
+            # self.playBtn.setToolTip('暂停')
 
-        if self.playMode == self.__PLAY_MODE_LOOP:
-            self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/loop.png'))
-            self.playModeBtn.setToolTip('循环播放 Ctrl+m')
-            self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/loop_hover.png')}")
-        elif self.playMode == self.__PLAY_MODE_SINGLE:
-            self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/single.png'))
-            self.playModeBtn.setToolTip('单曲播放 Ctrl+m')
-            self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/single_hover.png')}")
-        elif self.playMode == self.__PLAY_MODE_SEQUENTIAL:
-            self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/sequential.png'))
-            self.playModeBtn.setToolTip('顺序播放 Ctrl+m')
-            self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/sequential_hover.png')}")
-        elif self.playMode == self.__PLAY_MODE_RANDOM:
-            self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/random.png'))
-            self.playModeBtn.setToolTip('随机播放 Ctrl+m')
-            self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/random_hover.png')}")
+        # if self.playMode == self.__PLAY_MODE_LOOP:
+            # self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/loop.png'))
+            # self.playModeBtn.setToolTip('循环播放 Ctrl+m')
+            # self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/loop_hover.png')}")
+        # elif self.playMode == self.__PLAY_MODE_SINGLE:
+            # self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/single.png'))
+            # self.playModeBtn.setToolTip('单曲播放 Ctrl+m')
+            # self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/single_hover.png')}")
+        # elif self.playMode == self.__PLAY_MODE_SEQUENTIAL:
+            # self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/sequential.png'))
+            # self.playModeBtn.setToolTip('顺序播放 Ctrl+m')
+            # self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/sequential_hover.png')}")
+        # elif self.playMode == self.__PLAY_MODE_RANDOM:
+            # self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/random.png'))
+            # self.playModeBtn.setToolTip('随机播放 Ctrl+m')
+            # self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/random_hover.png')}")
 
         self.buttonHLayout.addWidget(self.playModeBtn)
         self.buttonHLayout.addWidget(self.backwardBtn)
@@ -185,14 +187,14 @@ class MusicPlayer(QWidget):
         self.player.setPlaylist(self.play_list)
         self.player.setVolume(self.voice)
 
-        if self.playMode == self.__PLAY_MODE_LOOP:
-            self.play_list.setPlaybackMode(QMediaPlaylist.Loop)
-        elif self.playMode == self.__PLAY_MODE_SINGLE:
-            self.play_list.setPlaybackMode(QMediaPlaylist.CurrentItemInLoop)
-        elif self.playMode == self.__PLAY_MODE_SEQUENTIAL:
-            self.play_list.setPlaybackMode(QMediaPlaylist.Sequential)
-        elif self.playMode == self.__PLAY_MODE_RANDOM:
-            self.play_list.setPlaybackMode(QMediaPlaylist.Random)
+        # if self.playMode == self.__PLAY_MODE_LOOP:
+            # self.play_list.setPlaybackMode(QMediaPlaylist.Loop)
+        # elif self.playMode == self.__PLAY_MODE_SINGLE:
+            # self.play_list.setPlaybackMode(QMediaPlaylist.CurrentItemInLoop)
+        # elif self.playMode == self.__PLAY_MODE_SEQUENTIAL:
+            # self.play_list.setPlaybackMode(QMediaPlaylist.Sequential)
+        # elif self.playMode == self.__PLAY_MODE_RANDOM:
+            # self.play_list.setPlaybackMode(QMediaPlaylist.Random)
 
     def SliderInit(self):
         # 播放进度条
@@ -330,6 +332,7 @@ class MusicPlayer(QWidget):
             self.player.setVolume(self.voice)
             self.voiceBtn.setIcon(QIcon(f'{self.__IMAGE}/voice.png'))
             self.voiceBtn.setToolTip('静音')
+        self.SaveSetting()
 
     def SliderVoiceEvent(self, vol):
         """
@@ -360,6 +363,61 @@ class MusicPlayer(QWidget):
         elif obj == self.voiceBtn and event.type() == QEvent.HoverLeave:
             self.sliderVoice.setVisible(False)
         return super().eventFilter(obj, event)
+
+    def LoadSetting(self):
+        if os.path.exists('setting.ini'):
+            config = configparser.ConfigParser()
+            config.read('setting.ini')
+
+            # 载入播放模式
+            self.playMode = int(config.get('MainConfig', 'play_mode'))
+            self.voice = int(config.get('MainConfig', 'volume'))
+            self.SetPlayModeStyleSheet()
+
+    def SetPlayModeStyleSheet(self):
+
+        # 默认加载模式, 由统一的变量管控,防止在初始化时出现不匹配的状态
+        if self.playState:
+            self.playBtn.setIcon(QIcon(f'{self.__IMAGE}/play.png'))
+            self.playBtn.setToolTip('播放')
+        else:
+            self.playBtn.setIcon(QIcon(f'{self.__IMAGE}/pause.png'))
+            self.playBtn.setToolTip('暂停')
+
+        if self.playMode == self.__PLAY_MODE_LOOP:
+            self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/loop.png'))
+            self.playModeBtn.setToolTip('循环播放 Ctrl+m')
+            self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/loop_hover.png')}")
+        elif self.playMode == self.__PLAY_MODE_SINGLE:
+            self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/single.png'))
+            self.playModeBtn.setToolTip('单曲播放 Ctrl+m')
+            self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/single_hover.png')}")
+        elif self.playMode == self.__PLAY_MODE_SEQUENTIAL:
+            self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/sequential.png'))
+            self.playModeBtn.setToolTip('顺序播放 Ctrl+m')
+            self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/sequential_hover.png')}")
+        elif self.playMode == self.__PLAY_MODE_RANDOM:
+            self.playModeBtn.setIcon(QIcon(f'{self.__IMAGE}/random.png'))
+            self.playModeBtn.setToolTip('随机播放 Ctrl+m')
+            self.playModeBtn.setStyleSheet("QPushButton:hover {icon: url('images/random_hover.png')}")
+
+        if self.playMode == self.__PLAY_MODE_LOOP:
+            self.play_list.setPlaybackMode(QMediaPlaylist.Loop)
+        elif self.playMode == self.__PLAY_MODE_SINGLE:
+            self.play_list.setPlaybackMode(QMediaPlaylist.CurrentItemInLoop)
+        elif self.playMode == self.__PLAY_MODE_SEQUENTIAL:
+            self.play_list.setPlaybackMode(QMediaPlaylist.Sequential)
+        elif self.playMode == self.__PLAY_MODE_RANDOM:
+            self.play_list.setPlaybackMode(QMediaPlaylist.Random)
+
+    def SaveSetting(self):
+        config = configparser.ConfigParser()
+
+        config.add_section('MainConfig')
+        config.set('MainConfig', 'play_mode', str(self.playMode))
+        config.set('MainConfig', 'volume', str(self.voice))
+        config.write(open('setting.ini', 'w'))
+
 
 
 if __name__ == '__main__':

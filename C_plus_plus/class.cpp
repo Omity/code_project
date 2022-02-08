@@ -43,16 +43,16 @@ int main(void)
  
    // box 1 的体积
    volume = Box1.height * Box1.length * Box1.breadth;
-   cout << "Box1 的体积：" << volume <<endl;
+   cout << "Box1 的体积:" << volume <<endl;
  
    // box 2 的体积
    volume = Box2.height * Box2.length * Box2.breadth;
-   cout << "Box2 的体积：" << volume <<endl;
+   cout << "Box2 的体积:" << volume <<endl;
  
  
    // box 3 详述
    Box3.set(16.0, 8.0, 12.0); 
    volume = Box3.get(); 
-   cout << "Box3 的体积：" << volume <<endl;
+   cout << "Box3 的体积:" << volume <<endl;
    return 0;
 }

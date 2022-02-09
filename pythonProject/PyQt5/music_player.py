@@ -128,8 +128,6 @@ class MusicPlayer(QWidget):
 
         self.voiceBtn = QPushButton()
         self.voiceBtn.installEventFilter(self)
-        self.voiceBtn.setIcon(QIcon(f'{self.__IMAGE}/voice.png'))
-        self.voiceBtn.setToolTip('静音')
 
         self.playBtn.setObjectName('playButton')
         self.forwardBtn.setObjectName('playButton')
@@ -344,6 +342,8 @@ class MusicPlayer(QWidget):
             self.voiceBtn.setToolTip('恢复音量')
         elif self.voiceState == 0:
             self.voiceState = 1
+            if self.voice == 0:         # 当退出时是静音状态,再次重启时将没有音量,此时voice为0,点击时将没有音量出现,故给予默认值50
+                self.voice = 50
             self.sliderVoice.setValue(self.voice)
             self.player.setVolume(self.voice)
             self.voiceBtn.setIcon(QIcon(f'{self.__IMAGE}/voice.png'))
@@ -436,6 +436,13 @@ class MusicPlayer(QWidget):
             self.play_list.setPlaybackMode(QMediaPlaylist.Sequential)
         elif self.playMode == self.__PLAY_MODE_RANDOM:
             self.play_list.setPlaybackMode(QMediaPlaylist.Random)
+
+		if self.voiceState:
+			self.voiceBtn.setIcon(QIcon(f'{self.__IMAGE}/voice.png'))
+			self.voiceBtn.setToolTip('静音')
+		elif self.voiceState == 0:
+			self.voiceBtn.setIcon(QIcon(f'{self.__IMAGE}/mute.png'))
+			self.voiceBtn.setToolTip('恢复音量')
 
     def SaveSetting(self):
         config = configparser.ConfigParser()

@@ -22,6 +22,9 @@ static int fpga_remove(struct platform_device *pdev)
 
 static int fpga_probe(struct platform_device *pdev)
 {
+	struct mmc_host *mmc;
+	int ret;
+	
 	return 0;
 }
 

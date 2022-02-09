@@ -105,12 +105,12 @@ class MusicApi:
     # 这样，接收方可以通过私钥解密密文3获得seckey(随机数)
     # 然后用seckey解密密文2获得密文1
     # 最终用统一协商的密钥nonce解密密文1最终获得text
-    def search(self, s, offset, type="1"):
+    def search(self, s, offset, types="1"):
         text = {"hlpretag": "<span class=\"s-fc7\">",
                 "hlposttag": "</span>",
                 "#/discover": "",
                 "s": s,
-                "type": type,
+                "type": types,
                 "offset": offset,
                 "total": "true",
                 "limit": "30",
@@ -129,10 +129,10 @@ class MusicApi:
 
     # 获取指定音乐列表(相当于主函数)
     @staticmethod
-    def GetMusicList(keywords):
+    def GetMusicList(self, keywords):
         music_list = []
         for offset in range(1):
-            result = MusicApi.search(keywords, str(offset))
+            result = self.search(keywords, str(offset))
             result = result['result']['songs']
             for music in result:
                 # if music['copyright'] == 1 and music['fee'] == 8:
@@ -146,4 +146,9 @@ class MusicApi:
         return music_list
 
 
-print(MusicApi.GetMusicList("像我这样的人"))   # 测试
+
+obj = MusicApi()
+
+
+
+print(obj.GetMusicList("像我这样的人"))   # 测试

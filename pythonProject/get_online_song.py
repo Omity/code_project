@@ -128,7 +128,6 @@ class MusicApi:
         return result
 
     # 获取指定音乐列表(相当于主函数)
-    @staticmethod
     def GetMusicList(self, keywords):
         music_list = []
         for offset in range(1):

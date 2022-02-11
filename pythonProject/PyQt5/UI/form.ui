@@ -1,0 +1,824 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>703</width>
+    <height>502</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="playAndSongInfoWidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>310</y>
+     <width>551</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>546</width>
+      <height>170</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <spacer name="verticalSpacer_16">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="album">
+           <property name="minimumSize">
+            <size>
+             <width>81</width>
+             <height>81</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>81</width>
+             <height>81</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>album</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <spacer name="verticalSpacer_14">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="song">
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>70</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>song</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="singer">
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>70</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>singer</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_15">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>18</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <spacer name="verticalSpacer_12">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_11">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QSlider" name="volumeSlider">
+               <property name="styleSheet">
+                <string notr="true">QSlider::groove:horizontal {
+
+border: 0px solid #bbb;
+ 
+}
+ 
+QSlider::sub-page:horizontal {
+ 
+background: #f03e3e;
+ 
+border-radius: 0px;
+ 
+margin-top:8px;
+ 
+margin-bottom:8px;
+ 
+}
+ 
+QSlider::add-page:horizontal {
+ 
+background: #e4e4e4;
+ 
+border: 0px solid #777;
+ 
+border-radius: 2px;
+ 
+margin-top:8px;
+ 
+margin-bottom:8px;
+ 
+}
+ 
+QSlider::handle:horizontal {
+ 
+background: #f03e3e;
+ 
+border: 1px solid #f03e3e;
+ 
+width: 14px;
+ 
+height:14px;
+ 
+border-radius: 8px;
+ 
+margin-top:2px;
+ 
+margin-bottom:2px;
+ 
+}
+ 
+QSlider::handle:horizontal:hover {
+ 
+background: #c92a2a;
+ 
+border: 1px solid #c92a2a;
+ 
+border-radius: 8px;
+ 
+}
+ 
+QSlider::sub-page:horizontal:disabled {
+ 
+background: #bbb;
+ 
+border-color: #999;
+ 
+}
+ 
+QSlider::add-page:horizontal:disabled {
+ 
+background: #eee;
+ 
+border-color: #999;
+ 
+}
+ 
+QSlider::handle:horizontal:disabled {
+ 
+background: #eee;
+ 
+border: 1px solid #aaa;
+ 
+border-radius: 4px;
+ 
+}</string>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="_2">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="playmode">
+               <property name="maximumSize">
+                <size>
+                 <width>31</width>
+                 <height>27</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>images/sequential.png</normaloff>images/sequential.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="previousBtn">
+               <property name="maximumSize">
+                <size>
+                 <width>31</width>
+                 <height>27</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;previous song&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>images/backward.png</normaloff>images/backward.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="playBtn">
+               <property name="maximumSize">
+                <size>
+                 <width>31</width>
+                 <height>27</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>images/play.png</normaloff>images/play.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="nextBtn">
+               <property name="maximumSize">
+                <size>
+                 <width>31</width>
+                 <height>27</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;next song&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>images/forward.png</normaloff>images/forward.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="volume">
+               <property name="maximumSize">
+                <size>
+                 <width>31</width>
+                 <height>27</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>images/voice.png</normaloff>images/voice.png</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_9">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_10">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_13">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="startTime">
+           <property name="maximumSize">
+            <size>
+             <width>31</width>
+             <height>17</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>0:0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="playSlider">
+           <property name="maximumSize">
+            <size>
+             <width>351</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QSlider::groove:horizontal {
+ 
+border: 0px solid #bbb;
+ 
+}
+ 
+QSlider::sub-page:horizontal {
+ 
+background: #f03e3e;
+ 
+border-radius: 0px;
+ 
+margin-top:8px;
+ 
+margin-bottom:8px;
+ 
+}
+ 
+QSlider::add-page:horizontal {
+ 
+background: #e4e4e4;
+ 
+border: 0px solid #777;
+ 
+border-radius: 2px;
+ 
+margin-top:8px;
+ 
+margin-bottom:8px;
+ 
+}
+ 
+QSlider::handle:horizontal {
+ 
+background: #f03e3e;
+ 
+border: 1px solid #f03e3e;
+ 
+width: 14px; //14
+ 
+height:14px;  //14
+ 
+border-radius: 8px;
+ 
+margin-top:2px;
+ 
+margin-bottom:2px;
+ 
+}
+ 
+QSlider::handle:horizontal:hover {
+ 
+background: #c92a2a;
+ 
+border: 1px solid #c92a2a;
+ 
+border-radius: 8px;
+ 
+}
+ 
+QSlider::sub-page:horizontal:disabled {
+ 
+background: #bbb;
+ 
+border-color: #999;
+ 
+}
+ 
+QSlider::add-page:horizontal:disabled {
+ 
+background: #eee;
+ 
+border-color: #999;
+ 
+}
+ 
+QSlider::handle:horizontal:disabled {
+ 
+background: #eee;
+ 
+border: 1px solid #aaa;
+ 
+border-radius: 4px;
+ 
+}</string>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="endTime">
+           <property name="maximumSize">
+            <size>
+             <width>31</width>
+             <height>17</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>0:0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <zorder></zorder>
+   <zorder></zorder>
+  </widget>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>40</y>
+     <width>551</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>551</width>
+     <height>50</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>50</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QWidget#widget_top{
+    background:rgb(245, 36, 67);
+	border-top-right-radius:10px;
+    border-top-left-radius:10px;
+}</string>
+   </property>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>20</y>
+      <width>62</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QPushButton" name="minimize">
+       <property name="minimumSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background:#004BFF;border-radius:7px;}QPushButton:hover{background:blue;}</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="maximize">
+       <property name="minimumSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background:#F7D674;border-radius:7px;}
+QPushButton:hover{background:yellow;}</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="close">
+       <property name="minimumSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{background:#6DDF6D;border-radius:7px;}QPushButton:hover{background:green;}</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QListWidget" name="leftFunctionWidget">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>90</y>
+     <width>141</width>
+     <height>192</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="lyricsWidget">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>90</y>
+     <width>256</width>
+     <height>192</height>
+    </rect>
+   </property>
+  </widget>
+  <zorder>playSlider</zorder>
+  <zorder>volumeSlider</zorder>
+  <zorder>layoutWidget</zorder>
+  <zorder>verticalSpacer</zorder>
+  <zorder>verticalSpacer_2</zorder>
+  <zorder>verticalSpacer_3</zorder>
+  <zorder>verticalSpacer_4</zorder>
+  <zorder>verticalSpacer_5</zorder>
+  <zorder>verticalSpacer_6</zorder>
+  <zorder>verticalSpacer_7</zorder>
+  <zorder>verticalSpacer_8</zorder>
+  <zorder>verticalSpacer_9</zorder>
+  <zorder>startTime</zorder>
+  <zorder>endTime</zorder>
+  <zorder>playSlider</zorder>
+  <zorder>frame</zorder>
+  <zorder>verticalSpacer_14</zorder>
+  <zorder>verticalSpacer_15</zorder>
+  <zorder>song</zorder>
+  <zorder>singer</zorder>
+  <zorder>album</zorder>
+  <zorder>verticalSpacer_14</zorder>
+  <zorder>verticalSpacer_15</zorder>
+  <zorder>verticalSpacer_16</zorder>
+  <zorder>playAndSongInfoWidget</zorder>
+  <zorder>widget</zorder>
+  <zorder>close</zorder>
+  <zorder>maximize</zorder>
+  <zorder>minimize</zorder>
+  <zorder>maximize</zorder>
+  <zorder>leftFunctionWidget</zorder>
+  <zorder>lyricsWidget</zorder>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

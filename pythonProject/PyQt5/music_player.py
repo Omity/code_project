@@ -618,6 +618,7 @@ class MusicPlayerMainWindow(QMainWindow):
         # self.ui.tableWidget.setColumnWidth(0, 80)
         # self.ui.tableWidget.setRowHeight(0, 50)
         # self.ui.tableWidget.setHorizontalHeaderLabels(['操作', '标题', '歌手', '专辑', '时间'])
+        self.ui.search.setPlaceholderText('new lane')
 
     def PlayStateChanged(self):
         """
@@ -876,7 +877,6 @@ class MusicPlayerMainWindow(QMainWindow):
             for i in range(len(result)):
                 self.ui.tableWidget.setItem(i, 0, QTableWidgetItem(result[i]['song']))
                 self.ui.tableWidget.setItem(i, 1, QTableWidgetItem(result[i]['singer']))
-
     def LoadSetting(self):
         """
         加载ini文件

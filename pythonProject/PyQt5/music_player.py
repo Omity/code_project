@@ -526,7 +526,18 @@ class MusicPlayer(QWidget):
         获取网络音乐
         :return:
         """
-        pass
+		if self.ui.searchEdit.text() != '':
+			searchText = self.ui.searchEdit.text()
+			result = self.searchAPI.GetMusicList(searchText)
+
+			for i in range(len(result)):
+				row = self.ui.tableWidget.rowCount()
+				self.ui.tableWidget.insertRow(row)
+				item1 = QTableWidgetItem(result[i]['song'])
+				item2 = QTableWidgetItem(result[i]['singer'])
+				self.ui.tableWidget.setItem(row, 1, item1)
+				self.ui.tableWidget.setItem(row, 2, item2)
+				self.ui.tableWidget.item(row, 1).setToolTip(result[i]['song'])
 
 
 class MusicPlayerMainWindow(QMainWindow):

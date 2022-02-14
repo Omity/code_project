@@ -6,13 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-<<<<<<< HEAD
     <width>982</width>
     <height>591</height>
-=======
-    <width>814</width>
-    <height>412</height>
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
    </rect>
   </property>
   <property name="sizePolicy">
@@ -53,22 +48,12 @@
     	border-bottom-left-radius:10px;
     }
 QListWidget{
-<<<<<<< HEAD
         /*font: 9pt &quot;霞鹜文楷&quot;;*/
 		font: 75 italic 11pt &quot;LKLUG&quot;;
-=======
-        font: 9pt &quot;霞鹜文楷&quot;;
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
 		/*background:rgb(255, 250, 232);*/
 		background-color: rgb(255, 255, 255);
 		
         }
-<<<<<<< HEAD
-QTableWidget {
-	  
-}
-=======
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
 </string>
     </property>
     <widget class="QWidget" name="widget" native="true">
@@ -111,20 +96,12 @@ QTableWidget {
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_6"/>
      </widget>
-<<<<<<< HEAD
      <widget class="QLineEdit" name="searchEdit">
-=======
-     <widget class="QLineEdit" name="search">
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
       <property name="geometry">
        <rect>
         <x>220</x>
         <y>10</y>
-<<<<<<< HEAD
         <width>181</width>
-=======
-        <width>141</width>
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
         <height>25</height>
        </rect>
       </property>
@@ -138,11 +115,7 @@ QTableWidget {
 }</string>
       </property>
      </widget>
-<<<<<<< HEAD
      <widget class="QLabel" name="iconLabel">
-=======
-     <widget class="QLabel" name="icon">
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -158,11 +131,7 @@ QTableWidget {
        <pixmap>images/new_icon1.png</pixmap>
       </property>
      </widget>
-<<<<<<< HEAD
      <widget class="QLabel" name="nameLabel">
-=======
-     <widget class="QLabel" name="name">
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -302,14 +271,11 @@ QPushButton:hover{background:yellow;}</string>
      <property name="styleSheet">
       <string notr="true"/>
      </property>
-<<<<<<< HEAD
      <item>
       <property name="text">
        <string>新建项目</string>
       </property>
      </item>
-=======
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
     </widget>
     <widget class="QWidget" name="playAndSongInfoWidget" native="true">
      <property name="geometry">
@@ -339,11 +305,7 @@ QPushButton:hover{background:yellow;}</string>
     	border-bottom-left-radius:10px;
     }</string>
      </property>
-<<<<<<< HEAD
      <widget class="QWidget" name="layoutWidget">
-=======
-     <widget class="QWidget" name="">
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
       <property name="geometry">
        <rect>
         <x>280</x>
@@ -452,11 +414,7 @@ QPushButton:hover{background:yellow;}</string>
        </item>
       </layout>
      </widget>
-<<<<<<< HEAD
      <widget class="QWidget" name="layoutWidget">
-=======
-     <widget class="QWidget" name="">
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
       <property name="geometry">
        <rect>
         <x>160</x>
@@ -772,7 +730,6 @@ QLabel {
       </property>
      </widget>
     </widget>
-<<<<<<< HEAD
     <widget class="QTableWidget" name="tableWidget">
      <property name="geometry">
       <rect>
@@ -818,8 +775,6 @@ QLabel {
     <zorder>playAndSongInfoWidget</zorder>
     <zorder>widget_3</zorder>
     <zorder>widget_4</zorder>
-=======
->>>>>>> c23e9e533aab08ca9038921c0989fb5074f9f39d
    </widget>
   </widget>
  </widget>

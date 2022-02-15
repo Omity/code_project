@@ -54,6 +54,38 @@ QListWidget{
 		background-color: rgb(255, 255, 255);
 		
         }
+QTableWidget::item{
+	  border:0px;
+	  border-bottom:0px;
+}
+
+QScrollBar:vertical {
+    border-radius:7px; 
+}
+
+QScrollBar::handle:vertical {
+    background:darkgray;
+    border-radius:6px;
+    margin-left:2px;
+    margin-right:2px;
+}
+QScrollBar::handle:vertical:hover {
+    background:gray;
+    border-radius:6px;
+}
+QScrollBar::up-arrow {
+	
+	
+	color: rgb(255, 255, 255);
+}
+
+QScrollBar::add-line:vertical{
+	image:url('');
+}
+QScrollBar::sub-line:vertical{
+	image:url('');
+}
+
 </string>
     </property>
     <widget class="QWidget" name="widget" native="true">
@@ -80,9 +112,12 @@ QListWidget{
      <property name="styleSheet">
       <string notr="true">QWidget{
 
-    background:rgb(245, 36, 67);
+    
+	background-color: rgb(52, 101, 164);
 	/*border-top-right-radius:10px;
     border-top-left-radius:10px;*/
+	border-bottom-left-radius:0px;
+	border-bottom-right-radius:0px;
 }</string>
      </property>
      <widget class="QWidget" name="layoutWidget_2">
@@ -99,20 +134,25 @@ QListWidget{
      <widget class="QLineEdit" name="searchEdit">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>230</x>
         <y>10</y>
-        <width>181</width>
-        <height>25</height>
+        <width>211</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
        <string notr="true">QLineEdit {      
 				  border:1px solid gray;
                 width:300px;
-                border-radius:10px;
+                border-radius:15px;
                 padding:2px 4px;
-				  background-color: rgb(211, 215, 207);
+				  
+	
+	background-color: rgb(186, 189, 182);
 }</string>
+      </property>
+      <property name="inputMask">
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="iconLabel">
@@ -250,6 +290,9 @@ QPushButton:hover{background:yellow;}</string>
         <height>25</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -258,24 +301,110 @@ QPushButton:hover{background:yellow;}</string>
         <normaloff>images/setting.png</normaloff>images/setting.png</iconset>
       </property>
      </widget>
-    </widget>
-    <widget class="QListWidget" name="lyricsWidget">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>50</y>
-       <width>671</width>
-       <height>261</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
-     <item>
-      <property name="text">
-       <string>新建项目</string>
+     <widget class="QPushButton" name="backwardWidgetBtn">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>10</y>
+        <width>26</width>
+        <height>26</height>
+       </rect>
       </property>
-     </item>
+      <property name="minimumSize">
+       <size>
+        <width>26</width>
+        <height>26</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>26</width>
+        <height>26</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton{
+		background-color: rgb(136, 138, 133);
+		font: 22pt &quot;Yrsa&quot;;
+		color: rgb(211, 215, 207);
+		border-radius:13px;
+		border:2px;
+}
+QPushButton:hover{
+		
+		color: rgb(255, 255, 255);
+}</string>
+      </property>
+      <property name="text">
+       <string>&lt;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="forwardWidgetBtn">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>10</y>
+        <width>26</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>26</width>
+        <height>26</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>26</width>
+        <height>26</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(136, 138, 133);
+font: 22pt &quot;Yrsa&quot;;
+color: rgb(211, 215, 207);
+border-radius:13px;
+border:2px;</string>
+      </property>
+      <property name="text">
+       <string>&gt;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="skinBtn">
+      <property name="geometry">
+       <rect>
+        <x>640</x>
+        <y>10</y>
+        <width>31</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>images/skin.png</normaloff>images/skin.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="letterBtn">
+      <property name="geometry">
+       <rect>
+        <x>670</x>
+        <y>10</y>
+        <width>31</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>images/letter.png</normaloff>images/letter.png</iconset>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="playAndSongInfoWidget" native="true">
      <property name="geometry">
@@ -573,37 +702,129 @@ margin-bottom:4px;
 		
 	
 	font: 75 11pt &quot;Ubuntu&quot;;
+	text-align:left;
 }
 
 QPushButton:hover {
 	
-	
-	
 	background-color: rgb(211, 215, 207);
-
 	border-bottom-left-radius:0px;
 	border-bottom-right-radius:0px;
 	
 }
-QPushButton:pressed {
+QPushButton:checked {
 
-	background-color: rgb(186, 189, 182);
+		background-color: rgb(211, 215, 207);
+		border-bottom-left-radius:0px;
+		border-bottom-right-radius:0px;
 }
 	
 QLabel {
 	
 	font: 75 11pt &quot;Ubuntu&quot;;
+	text-align:right;
 	background-color: rgb(255, 255, 255);
 }
 </string>
      </property>
+     <widget class="QLabel" name="songListLabel">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>90</y>
+        <width>139</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">text-align:left;</string>
+      </property>
+      <property name="text">
+       <string>     我的音乐</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="foundSongBtn">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>141</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>OpenHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushbutton#foundSongBtn:checked{
+	/*font: 75 italic 11pt &quot;Ubuntu Mono&quot;;*/
+	font: 75 15pt &quot;Ubuntu&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>发现音乐</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="podcastBtn">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>30</y>
+        <width>141</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="text">
+       <string>播客</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="personalFMBtn">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>60</y>
+        <width>141</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="text">
+       <string>私人FM</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
+     </widget>
      <widget class="QPushButton" name="localMusicBtn">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>40</y>
-        <width>141</width>
-        <height>25</height>
+        <y>110</y>
+        <width>139</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="cursor">
@@ -613,36 +834,55 @@ QLabel {
        <string notr="true"/>
       </property>
       <property name="text">
-       <string>本地音乐</string>
+       <string> 本地音乐</string>
       </property>
       <property name="icon">
        <iconset>
         <normaloff>images/local_download.png</normaloff>images/local_download.png</iconset>
       </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
      </widget>
-     <widget class="QLabel" name="songListLabel">
+     <widget class="QPushButton" name="pushButton">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>10</y>
-        <width>141</width>
-        <height>20</height>
+        <y>140</y>
+        <width>139</width>
+        <height>31</height>
        </rect>
       </property>
-      <property name="text">
-       <string>我的音乐</string>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+      <property name="text">
+       <string>最近播放</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>images/recent_play_icon.png</normaloff>images/recent_play_icon.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="myLikeBtn">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>70</y>
-        <width>141</width>
-        <height>25</height>
+        <y>170</y>
+        <width>139</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="cursor">
@@ -655,25 +895,37 @@ QLabel {
        <iconset>
         <normaloff>images/like_icon.png</normaloff>images/like_icon.png</iconset>
       </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QPushButton" name="songListBtn">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>100</y>
+        <y>200</y>
         <width>141</width>
-        <height>25</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="text">
-       <string>歌单</string>
+       <string> 歌单</string>
       </property>
       <property name="icon">
        <iconset>
         <normaloff>images/song_list_icon.png</normaloff>images/song_list_icon.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
@@ -748,7 +1000,23 @@ QLabel {
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true"/>
+      <string notr="true">QScrollBar:vertical {
+    border-radius:7px; 
+    background:blue; 
+    padding-top:14px;
+    padding-bottom:14px;
+}
+
+QScrollBar::handle:vertical {
+    background:darkgray;
+    border-radius:6px;
+    margin-left:2px;
+    margin-right:2px;
+}
+QScrollBar::handle:vertical:hover {
+    background:gray;
+    border-radius:6px;
+}</string>
      </property>
      <property name="sizeAdjustPolicy">
       <enum>QAbstractScrollArea::AdjustIgnored</enum>
@@ -769,7 +1037,6 @@ QLabel {
       </property>
      </column>
     </widget>
-    <zorder>lyricsWidget</zorder>
     <zorder>tableWidget</zorder>
     <zorder>widget</zorder>
     <zorder>playAndSongInfoWidget</zorder>

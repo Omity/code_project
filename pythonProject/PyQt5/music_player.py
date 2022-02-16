@@ -615,20 +615,28 @@ class MusicPlayerMainWindow(QMainWindow):
         self.ui.searchEdit.editingFinished.connect(lambda: self.SearchOnlineSong())
 
         # 搜索列表
-        self.ui.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 所有列自动拉伸，充满界面
+        self.ui.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)  # 所有列固定大小
+        self.ui.tableWidget.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.ui.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.ui.tableWidget.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.ui.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中, 整行选中
-        self.ui.tableWidget.resizeColumnsToContents()  # 设置列宽高按照内容自适应
-        self.ui.tableWidget.resizeRowsToContents()  # 设置行宽和高按照内容自适应
+        #self.ui.tableWidget.resizeColumnsToContents()  # 设置列宽高按照内容自适应
+        #self.ui.tableWidget.resizeRowsToContents()  # 设置行宽和高按照内容自适应
         self.ui.tableWidget.verticalHeader().setVisible(False)  # 设置列标题隐藏（针对列标题纵向排列
         self.ui.tableWidget.setShowGrid(False)       # 无外框
         self.ui.tableWidget.horizontalHeader().setSectionsClickable(False)  # 表头无法点击
         # 单元格宽高设置
-        self.ui.tableWidget.horizontalHeader().resizeSection(0, 100)
+        self.ui.tableWidget.setColumnCount(5)
+        self.ui.tableWidget.setRowCount(1)
+        size = self.ui.tableWidget.width()
+        self.ui.tableWidget.horizontalHeader().resizeSection(0, int(size / 6))
+        self.ui.tableWidget.horizontalHeader().resizeSection(1, int(size / 6 * 2))
+        self.ui.tableWidget.horizontalHeader().resizeSection(2, int(size / 6))
+        self.ui.tableWidget.horizontalHeader().resizeSection(3, int(size / 6))
+        self.ui.tableWidget.horizontalHeader().resizeSection(4, int(size / 6))
         # self.ui.tableWidget.setColumnWidth(0, 80)
         # self.ui.tableWidget.setRowHeight(0, 50)
-        # self.ui.tableWidget.setHorizontalHeaderLabels(['操作', '标题', '歌手', '专辑', '时间'])
+         self.ui.tableWidget.setHorizontalHeaderLabels(['操作', '标题', '歌手', '专辑', '时间'])
 
     def PlayStateChanged(self):
         """
@@ -884,9 +892,14 @@ class MusicPlayerMainWindow(QMainWindow):
             searchText = self.ui.searchEdit.text()
             result = self.searchAPI.GetMusicList(searchText)
 
+			self.ui.tableWidget.clearContents()
+            self.ui.tableWidget.setRowCount(0)
             for i in range(len(result)):
-                self.ui.tableWidget.setItem(i, 0, QTableWidgetItem(result[i]['song']))
-                self.ui.tableWidget.setItem(i, 1, QTableWidgetItem(result[i]['singer']))
+				row = self.ui.tableWidget.rowCount()
+				self.ui.tableWidget.insertRow(row)
+                self.ui.tableWidget.setItem(i, 1, QTableWidgetItem(result[i]['song']))
+                self.ui.tableWidget.setItem(i, 2, QTableWidgetItem(result[i]['singer']))
+                self.ui.tableWidget.item(row, 1).setToolTip(result[i]['song'])
 
     def LoadSetting(self):
         """

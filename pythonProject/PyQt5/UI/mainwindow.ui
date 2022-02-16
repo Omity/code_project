@@ -34,8 +34,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>811</width>
-      <height>411</height>
+      <width>981</width>
+      <height>561</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -57,6 +57,11 @@ QListWidget{
 QTableWidget::item{
 	  border:0px;
 	  border-bottom:0px;
+	 
+}
+QTableWidget::item:hover{
+		
+	background-color: rgb(211, 215, 207);
 }
 
 QScrollBar:vertical {
@@ -86,6 +91,10 @@ QScrollBar::sub-line:vertical{
 	image:url('');
 }
 
+QToolTip{
+	font-style:oblique;
+}
+
 </string>
     </property>
     <widget class="QWidget" name="widget" native="true">
@@ -93,7 +102,7 @@ QScrollBar::sub-line:vertical{
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>811</width>
+       <width>981</width>
        <height>50</height>
       </rect>
      </property>
@@ -120,21 +129,10 @@ QScrollBar::sub-line:vertical{
 	border-bottom-right-radius:0px;
 }</string>
      </property>
-     <widget class="QWidget" name="layoutWidget_2">
-      <property name="geometry">
-       <rect>
-        <x>740</x>
-        <y>20</y>
-        <width>62</width>
-        <height>18</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_6"/>
-     </widget>
      <widget class="QLineEdit" name="searchEdit">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>270</x>
         <y>10</y>
         <width>211</width>
         <height>31</height>
@@ -187,143 +185,187 @@ QScrollBar::sub-line:vertical{
        <string>MY MUSIC</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="closeBtn">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>780</x>
-        <y>20</y>
-        <width>16</width>
-        <height>16</height>
+        <x>770</x>
+        <y>10</y>
+        <width>201</width>
+        <height>41</height>
        </rect>
       </property>
-      <property name="minimumSize">
-       <size>
-        <width>16</width>
-        <height>16</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16</width>
-        <height>16</height>
-       </size>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;close&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton{background:#6DDF6D;border-radius:7px;}QPushButton:hover{background:green;}</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="maximizeBtn">
-      <property name="geometry">
-       <rect>
-        <x>760</x>
-        <y>20</y>
-        <width>16</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>16</width>
-        <height>16</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16</width>
-        <height>16</height>
-       </size>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximize&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton{background:#F7D674;border-radius:7px;}
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QPushButton" name="settingBtn">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>images/setting.png</normaloff>images/setting.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="skinBtn">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>images/skin.png</normaloff>images/skin.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>29</width>
+           <height>33</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="letterBtn">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>images/letter.png</normaloff>images/letter.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>27</width>
+           <height>26</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>32</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="minimizeBtn">
+         <property name="minimumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimize&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton{background:#004BFF;border-radius:7px;}QPushButton:hover{background:blue;}</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="maximizeBtn">
+         <property name="minimumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximize&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton{background:#F7D674;border-radius:7px;}
 QPushButton:hover{background:yellow;}</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="closeBtn">
+         <property name="minimumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;close&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton{background:#6DDF6D;border-radius:7px;}QPushButton:hover{background:green;}</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
-     <widget class="QPushButton" name="minimizeBtn">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>740</x>
-        <y>20</y>
-        <width>16</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>16</width>
-        <height>16</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16</width>
-        <height>16</height>
-       </size>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimize&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton{background:#004BFF;border-radius:7px;}QPushButton:hover{background:blue;}</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="settingBtn">
-      <property name="geometry">
-       <rect>
-        <x>610</x>
+        <x>200</x>
         <y>10</y>
-        <width>31</width>
-        <height>25</height>
+        <width>60</width>
+        <height>28</height>
        </rect>
       </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>images/setting.png</normaloff>images/setting.png</iconset>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="backwardWidgetBtn">
-      <property name="geometry">
-       <rect>
-        <x>160</x>
-        <y>10</y>
-        <width>26</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>26</width>
-        <height>26</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>26</width>
-        <height>26</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton{
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QPushButton" name="backwardWidgetBtn">
+         <property name="minimumSize">
+          <size>
+           <width>26</width>
+           <height>26</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>26</width>
+           <height>26</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton{
 		background-color: rgb(136, 138, 133);
 		font: 22pt &quot;Yrsa&quot;;
 		color: rgb(211, 215, 207);
@@ -334,84 +376,47 @@ QPushButton:hover{
 		
 		color: rgb(255, 255, 255);
 }</string>
-      </property>
-      <property name="text">
-       <string>&lt;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="forwardWidgetBtn">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>10</y>
-        <width>26</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>26</width>
-        <height>26</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>26</width>
-        <height>26</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(136, 138, 133);
+         </property>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="forwardWidgetBtn">
+         <property name="minimumSize">
+          <size>
+           <width>26</width>
+           <height>26</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>26</width>
+           <height>26</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(136, 138, 133);
 font: 22pt &quot;Yrsa&quot;;
 color: rgb(211, 215, 207);
 border-radius:13px;
 border:2px;</string>
-      </property>
-      <property name="text">
-       <string>&gt;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="skinBtn">
-      <property name="geometry">
-       <rect>
-        <x>640</x>
-        <y>10</y>
-        <width>31</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>images/skin.png</normaloff>images/skin.png</iconset>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="letterBtn">
-      <property name="geometry">
-       <rect>
-        <x>670</x>
-        <y>10</y>
-        <width>31</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>images/letter.png</normaloff>images/letter.png</iconset>
-      </property>
+         </property>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="playAndSongInfoWidget" native="true">
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>310</y>
-       <width>811</width>
+       <y>460</y>
+       <width>981</width>
        <height>100</height>
       </rect>
      </property>
@@ -428,7 +433,10 @@ border:2px;</string>
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QWidget{
+      <string notr="true">QWidget#playAndSongInfoWidget{
+		border-top:1px solid rgb(211, 215, 207);
+}
+QWidget{
 		background:rgb(255, 255, 255);
         border-bottom-right-radius:10px;
     	border-bottom-left-radius:10px;
@@ -437,8 +445,8 @@ border:2px;</string>
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>20</y>
+        <x>370</x>
+        <y>10</y>
         <width>261</width>
         <height>41</height>
        </rect>
@@ -513,7 +521,7 @@ border:2px;</string>
           </size>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;next song&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;下一首&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string/>
@@ -525,19 +533,28 @@ border:2px;</string>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="volumeBtn">
+        <widget class="QPushButton" name="lyricsBtn">
          <property name="maximumSize">
           <size>
            <width>31</width>
-           <height>27</height>
+           <height>36</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;打开歌词&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string/>
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>images/voice.png</normaloff>images/voice.png</iconset>
+           <normaloff>images/lyrics.png</normaloff>images/lyrics.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>21</height>
+          </size>
          </property>
         </widget>
        </item>
@@ -546,9 +563,9 @@ border:2px;</string>
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>240</x>
         <y>60</y>
-        <width>490</width>
+        <width>498</width>
         <height>31</height>
        </rect>
       </property>
@@ -679,7 +696,7 @@ margin-bottom:4px;
      <widget class="QWidget" name="horizontalLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>10</x>
         <y>10</y>
         <width>101</width>
         <height>80</height>
@@ -687,21 +704,86 @@ margin-bottom:4px;
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2"/>
      </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_2">
+      <property name="geometry">
+       <rect>
+        <x>860</x>
+        <y>30</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QPushButton" name="groupListenBtn">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>images/group.png</normaloff>images/group.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="volumeBtn">
+         <property name="maximumSize">
+          <size>
+           <width>31</width>
+           <height>27</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>images/voice.png</normaloff>images/voice.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="recentPlayBtn">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;播放列表&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>images/recent_play_list.png</normaloff>images/recent_play_list.png</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="widget_3" native="true">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>50</y>
-       <width>141</width>
-       <height>261</height>
+       <width>161</width>
+       <height>411</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">QPushButton {
+      <string notr="true">QWidget#widget_3{
+	border-right:1px solid rgb(211, 215, 207);
+	/*color: rgb(186, 189, 182);*/
+	border-bottom:1px solid rgb(211, 215, 207);
+	border-bottom-right-radius:0px;
+}
+QPushButton {
 		
-	
-	font: 75 11pt &quot;Ubuntu&quot;;
+	font: 75 14pt &quot;Ubuntu&quot;;
 	text-align:left;
 }
 
@@ -710,62 +792,41 @@ QPushButton:hover {
 	background-color: rgb(211, 215, 207);
 	border-bottom-left-radius:0px;
 	border-bottom-right-radius:0px;
-	
+	font-weight:170;
 }
 QPushButton:checked {
 
-		background-color: rgb(211, 215, 207);
+		background-color: rgb(186, 189, 182);
 		border-bottom-left-radius:0px;
 		border-bottom-right-radius:0px;
 }
 	
 QLabel {
 	
-	font: 75 11pt &quot;Ubuntu&quot;;
+	font: 75 14pt &quot;Ubuntu&quot;;
 	text-align:right;
 	background-color: rgb(255, 255, 255);
 }
 </string>
      </property>
-     <widget class="QLabel" name="songListLabel">
+     <widget class="QPushButton" name="songListBtn">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>90</y>
-        <width>139</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">text-align:left;</string>
-      </property>
-      <property name="text">
-       <string>     我的音乐</string>
-      </property>
-      <property name="textFormat">
-       <enum>Qt::AutoText</enum>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="foundSongBtn">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>141</width>
-        <height>25</height>
+        <y>245</y>
+        <width>160</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="cursor">
-       <cursorShape>OpenHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushbutton#foundSongBtn:checked{
-	/*font: 75 italic 11pt &quot;Ubuntu Mono&quot;;*/
-	font: 75 15pt &quot;Ubuntu&quot;;
-}</string>
+       <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="text">
-       <string>发现音乐</string>
+       <string> 歌单</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>images/song_list_icon.png</normaloff>images/song_list_icon.png</iconset>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -774,20 +835,24 @@ QLabel {
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="podcastBtn">
+     <widget class="QPushButton" name="myLikeBtn">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>30</y>
-        <width>141</width>
-        <height>25</height>
+        <y>210</y>
+        <width>160</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="text">
-       <string>播客</string>
+       <string>我喜欢的音乐</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>images/like_icon.png</normaloff>images/like_icon.png</iconset>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -796,20 +861,24 @@ QLabel {
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="personalFMBtn">
+     <widget class="QPushButton" name="pushButton">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>60</y>
-        <width>141</width>
-        <height>25</height>
+        <y>175</y>
+        <width>160</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="text">
-       <string>私人FM</string>
+       <string>最近播放</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>images/recent_play_icon.png</normaloff>images/recent_play_icon.png</iconset>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -822,9 +891,9 @@ QLabel {
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>110</y>
-        <width>139</width>
-        <height>31</height>
+        <y>140</y>
+        <width>160</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="cursor">
@@ -850,24 +919,51 @@ QLabel {
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QLabel" name="songListLabel">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>140</y>
-        <width>139</width>
-        <height>31</height>
+        <y>105</y>
+        <width>160</width>
+        <height>29</height>
+       </rect>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>29</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">text-align:left;</string>
+      </property>
+      <property name="text">
+       <string>     我的音乐</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="personalFMBtn">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>70</y>
+        <width>159</width>
+        <height>29</height>
        </rect>
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
-      <property name="text">
-       <string>最近播放</string>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:checked{
+	/*font: 75 italic 11pt &quot;Ubuntu Mono&quot;;*/
+	font-weight:600;
+}</string>
       </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>images/recent_play_icon.png</normaloff>images/recent_play_icon.png</iconset>
+      <property name="text">
+       <string>私人FM</string>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -876,24 +972,27 @@ QLabel {
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="myLikeBtn">
+     <widget class="QPushButton" name="podcastBtn">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>170</y>
-        <width>139</width>
-        <height>31</height>
+        <y>35</y>
+        <width>160</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
-      <property name="text">
-       <string>我喜欢的音乐</string>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:checked{
+	/*font: 75 italic 11pt &quot;Ubuntu Mono&quot;;*/
+	font-weight:600;
+}
+</string>
       </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>images/like_icon.png</normaloff>images/like_icon.png</iconset>
+      <property name="text">
+       <string>播客</string>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -902,24 +1001,26 @@ QLabel {
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="songListBtn">
+     <widget class="QPushButton" name="foundSongBtn">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>200</y>
-        <width>141</width>
-        <height>31</height>
+        <y>0</y>
+        <width>160</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
-      <property name="text">
-       <string> 歌单</string>
+      <property name="styleSheet">
+       <string notr="true">QPushButton:checked{
+	/*font: 75 italic 11pt &quot;Ubuntu Mono&quot;;*/
+	font-weight:600;
+}</string>
       </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>images/song_list_icon.png</normaloff>images/song_list_icon.png</iconset>
+      <property name="text">
+       <string>发现音乐</string>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -932,10 +1033,10 @@ QLabel {
     <widget class="QWidget" name="widget_4" native="true">
      <property name="geometry">
       <rect>
-       <x>490</x>
-       <y>190</y>
-       <width>41</width>
-       <height>151</height>
+       <x>903</x>
+       <y>360</y>
+       <width>21</width>
+       <height>141</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -953,10 +1054,10 @@ QLabel {
      <widget class="QSlider" name="volumeSlider">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>20</y>
+        <x>0</x>
+        <y>10</y>
         <width>20</width>
-        <height>121</height>
+        <height>120</height>
        </rect>
       </property>
       <property name="minimumSize">
@@ -985,42 +1086,79 @@ QLabel {
     <widget class="QTableWidget" name="tableWidget">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>160</x>
        <y>50</y>
-       <width>671</width>
-       <height>261</height>
+       <width>821</width>
+       <height>411</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <family>Sans</family>
-       <weight>75</weight>
-       <italic>true</italic>
-       <bold>true</bold>
+       <family>Noto Sans CJK SC</family>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="styleSheet">
-      <string notr="true">QScrollBar:vertical {
-    border-radius:7px; 
-    background:blue; 
-    padding-top:14px;
-    padding-bottom:14px;
-}
-
-QScrollBar::handle:vertical {
-    background:darkgray;
-    border-radius:6px;
-    margin-left:2px;
-    margin-right:2px;
-}
-QScrollBar::handle:vertical:hover {
-    background:gray;
-    border-radius:6px;
-}</string>
+      <string notr="true"/>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
      <property name="sizeAdjustPolicy">
       <enum>QAbstractScrollArea::AdjustIgnored</enum>
      </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="horizontalScrollMode">
+      <enum>QAbstractItemView::ScrollPerItem</enum>
+     </property>
+     <property name="showGrid">
+      <bool>false</bool>
+     </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+     <property name="columnCount">
+      <number>7</number>
+     </property>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>135</number>
+     </attribute>
+     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>操作</string>
+      </property>
+     </column>
      <column>
       <property name="text">
        <string>标题</string>
@@ -1036,6 +1174,13 @@ QScrollBar::handle:vertical:hover {
        <string>专辑</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>时间</string>
+      </property>
+     </column>
+     <column/>
+     <column/>
     </widget>
     <zorder>tableWidget</zorder>
     <zorder>widget</zorder>
